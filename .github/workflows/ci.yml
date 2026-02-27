@@ -24,11 +24,11 @@ jobs:
 
       - name: Build backend
         run: mvn clean install --batch-mode
-        working-directory: backend
+        working-directory: backend/campus_core
 
       - name: Run backend tests
         run: mvn test --batch-mode
-        working-directory: backend
+        working-directory: backend/campus_core
 
   build-frontend:
     runs-on: ubuntu-latest
