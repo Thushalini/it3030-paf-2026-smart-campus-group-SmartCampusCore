@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.sliit</groupId>
-	<artifactId>campus_ops</artifactId>
+	<artifactId>campus_core</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>campus_ops</name>
+	<name>campus_core</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
