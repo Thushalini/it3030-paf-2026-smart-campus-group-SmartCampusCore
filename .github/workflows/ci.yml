@@ -15,26 +15,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Set up JDK 17 + Maven
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          cache: 'maven'
 
       - name: Build backend
-        run: ./mvnw clean install --batch-mode
+        run: mvn clean install --batch-mode
         working-directory: backend
 
       - name: Run backend tests
-        run: ./mvnw test --batch-mode
+        run: mvn test --batch-mode
         working-directory: backend
 
   build-frontend:
