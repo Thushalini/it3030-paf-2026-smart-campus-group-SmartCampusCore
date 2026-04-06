@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.util.List;
 
 @Document(collection = "resources")
 public class Resource {
@@ -12,39 +13,178 @@ public class Resource {
     private String id;
 
     private String name;
+    private String resourceCode;
     private ResourceType type;
-    private Integer capacity;     // can be null for equipment
+    private String description;
+    private Integer capacity;
     private String location;
+    private String building;
+    private String floor;
+    private String roomNumber;
+    private String availabilityWindow;
     private ResourceStatus status;
+    private List<String> features;
+    private String imageUrl;
+
+    private Double ratingAverage;
+    private Integer ratingCount;
+    private Integer bookingCount;
 
     private Instant createdAt;
     private Instant updatedAt;
 
-    public Resource() {}
+    public Resource() {
+    }
 
-    // ----- Getters & Setters -----
+    public String getId() {
+        return id;
+    }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getName() {
+        return name;
+    }
 
-    public ResourceType getType() { return type; }
-    public void setType(ResourceType type) { this.type = type; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public Integer getCapacity() { return capacity; }
-    public void setCapacity(Integer capacity) { this.capacity = capacity; }
+    public String getResourceCode() {
+        return resourceCode;
+    }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public void setResourceCode(String resourceCode) {
+        this.resourceCode = resourceCode;
+    }
 
-    public ResourceStatus getStatus() { return status; }
-    public void setStatus(ResourceStatus status) { this.status = status; }
+    public ResourceType getType() {
+        return type;
+    }
 
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public void setType(ResourceType type) {
+        this.type = type;
+    }
 
-    public Instant getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(String building) {
+        this.building = building;
+    }
+
+    public String getFloor() {
+        return floor;
+    }
+
+    public void setFloor(String floor) {
+        this.floor = floor;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
+    }
+
+    public String getAvailabilityWindow() {
+        return availabilityWindow;
+    }
+
+    public void setAvailabilityWindow(String availabilityWindow) {
+        this.availabilityWindow = availabilityWindow;
+    }
+
+    public ResourceStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ResourceStatus status) {
+        this.status = status;
+    }
+
+    public List<String> getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(List<String> features) {
+        this.features = features;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Double getRatingAverage() {
+        return ratingAverage;
+    }
+
+    public void setRatingAverage(Double ratingAverage) {
+        this.ratingAverage = ratingAverage;
+    }
+
+    public Integer getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(Integer ratingCount) {
+        this.ratingCount = ratingCount;
+    }
+
+    public Integer getBookingCount() {
+        return bookingCount;
+    }
+
+    public void setBookingCount(Integer bookingCount) {
+        this.bookingCount = bookingCount;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
