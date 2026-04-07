@@ -13,16 +13,27 @@ import com.sliit.campus_core.repository.NotificationRepository;
 @Service
 public class NotificationService {
 
-    @Autowired
-    private NotificationRepository repository;
+    @Autowired private NotificationRepository repository;
 
-    public void sendNotification(User user, String message) {
+    // type = "BOOKING", "TICKET", or "COMMENT"
+    public void sendNotification(User user, String message, String type) {
+
+        // Check user preferences before saving
+        boolean allowed = switch (type) {
+            case "BOOKING" -> user.isBookingNotifications();
+            case "TICKET"  -> user.isTicketNotifications();
+            case "COMMENT" -> user.isCommentNotifications();
+            default -> true;
+        };
+
+        if (!allowed) return;
+
         Notification n = new Notification();
         n.setUserId(user.getId());
         n.setMessage(message);
+        n.setType(type);
         n.setCreatedAt(LocalDateTime.now());
         n.setRead(false);
-
         repository.save(n);
     }
 
