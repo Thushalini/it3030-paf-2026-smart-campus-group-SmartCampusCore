@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { getResourceById } from "../api/resourcesApi";
 import "./ResourceDetailsPage.css";
 
 function ResourceDetailsPage() {
   const { id } = useParams();
+  const location = useLocation();
+
+  const isAdminView = location.pathname.startsWith("/admin");
+  const backPath = isAdminView ? "/admin/resources" : "/student/resources";
+  const backLabel = isAdminView ? "Back to Admin Resources" : "Back to Resources";
 
   const [resource, setResource] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,11 +38,31 @@ function ResourceDetailsPage() {
   }
 
   if (error) {
-    return <p className="details-status error">{error}</p>;
+    return (
+      <div className="resource-details-page">
+        <div className="details-error-box">
+          <h2>Unable to load resource</h2>
+          <p className="details-status error">{error}</p>
+          <Link to={backPath} className="back-button">
+            {backLabel}
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   if (!resource) {
-    return <p className="details-status">Resource not found.</p>;
+    return (
+      <div className="resource-details-page">
+        <div className="details-error-box">
+          <h2>Resource not found</h2>
+          <p className="details-status">This resource does not exist or may have been deleted.</p>
+          <Link to={backPath} className="back-button">
+            {backLabel}
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -51,6 +76,10 @@ function ResourceDetailsPage() {
             }
             alt={resource.name}
             className="details-image"
+            onError={(e) => {
+              e.target.src =
+                "https://images.unsplash.com/photo-1497366412874-3415097a27e7";
+            }}
           />
         </div>
 
@@ -134,8 +163,8 @@ function ResourceDetailsPage() {
           </div>
 
           <div className="details-actions">
-            <Link to="/student/resources" className="back-button">
-              Back to Resources
+            <Link to={backPath} className="back-button">
+              {backLabel}
             </Link>
           </div>
         </div>
