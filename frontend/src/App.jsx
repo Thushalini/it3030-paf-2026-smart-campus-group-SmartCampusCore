@@ -41,6 +41,9 @@ function App() {
         <Route path="/resources" element={<StudentResourcesPage />} />
         <Route path="/resources/:id" element={<ResourceDetailsPage />} />
 
+        <Route path="/student/resources" element={<StudentResourcesPage />} />
+        <Route path="/student/resources/:id" element={<ResourceDetailsPage />} />
+
         <Route path="/admin/resources" element={<AdminResourcesPage />} />
         <Route path="/admin/resources/new" element={<ResourceFormPage />} />
         <Route path="/admin/resources/edit/:id" element={<ResourceFormPage />} />
