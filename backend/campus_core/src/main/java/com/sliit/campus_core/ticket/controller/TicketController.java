@@ -1,21 +1,29 @@
 package com.sliit.campus_core.ticket.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.sliit.campus_core.ticket.model.Ticket;
+import com.sliit.campus_core.ticket.repository.TicketRepository;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/tickets")
 public class TicketController {
  
-    @GetMapping("/")
-    public String rootEndpoint() {
-        return "Hello world!";
+    private final TicketRepository ticketRepository;
+
+    public TicketController(TicketRepository ticketRepository) {
+        this.ticketRepository = ticketRepository;
     }
 
-    @GetMapping("/hello")
-    public String hello(@RequestParam(defaultValue = "Guest") String name) {
-        return "Hello " + name;
+    @PostMapping
+    public ResponseEntity<Ticket> createTicket(@RequestBody Ticket ticket) {
+        Ticket saved = ticketRepository.save(ticket);
+        return ResponseEntity.ok(saved);
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllTickets() {
+        return ResponseEntity.ok(ticketRepository.findAll());
+    }
 
 }
