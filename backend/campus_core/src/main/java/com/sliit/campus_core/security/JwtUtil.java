@@ -1,17 +1,28 @@
 package com.sliit.campus_core.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 
 @Component
 public class JwtUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
-    private final String SECRET_KEY = "mysecretkey123"; // change in production
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
+    
+    // NOTE: Use a sufficiently long secret for HS256 (>= 32 bytes). Replace with env/config in production.
+    // private final String SECRET_KEY = "myverysecuresecretkey_that_is_at_least_32_bytes!";
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 hours
 
     private Key getKey() {
@@ -46,18 +57,9 @@ public class JwtUtil {
                    !Jwts.parserBuilder().setSigningKey(getKey()).build()
                         .parseClaimsJws(token).getBody().getExpiration().before(new Date());
         } catch (JwtException e) {
+            logger.debug("JWT validation failed: {}", e.getMessage());
             return false;
         }
     }
 
-    // private boolean isTokenExpired(String token) {
-    //     return extractClaims(token).getExpiration().before(new Date());
-    // }
-
-    // private Claims extractClaims(String token) {
-    //     return Jwts.parser()
-    //             .setSigningKey(SECRET_KEY)
-    //             .parseClaimsJws(token)
-    //             .getBody();
-    // }
 }
