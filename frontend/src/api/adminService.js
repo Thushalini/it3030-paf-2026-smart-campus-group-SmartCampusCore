@@ -26,7 +26,7 @@ export const assignRole = async (id, role, token) => {
 
 // ✅ Delete user
 export const deleteUser = async (id, token) => {
-  return axios.delete(`http://localhost:8080/api/users/${id}`, {
+  return axios.delete(`${API}/users/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

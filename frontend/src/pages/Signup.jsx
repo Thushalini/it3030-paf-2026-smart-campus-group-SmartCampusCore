@@ -9,6 +9,11 @@ function Signup() {
         name: "",
         email: "",
         password: "",
+        phone: "",
+        department: "",
+        userType: "STUDENT",
+        studentId: "",
+        staffId: "",
     });
 
     const handleChange = (e) => {
@@ -27,9 +32,8 @@ function Signup() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            
-            <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300 p-4">
+            <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg">
 
                 <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
                     Create Account
@@ -38,35 +42,81 @@ function Signup() {
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
                     <input
-                    name="name"
-                    placeholder="Full Name"
-                    onChange={handleChange}
-                    required
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        name="name"
+                        placeholder="Full Name"
+                        onChange={handleChange}
+                        required
+                        className="input"
                     />
 
                     <input
-                    name="email"
-                    placeholder="Email Address"
-                    onChange={handleChange}
-                    required
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        name="email"
+                        placeholder="Email Address"
+                        onChange={handleChange}
+                        required
+                        className="input"
                     />
 
                     <input
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    onChange={handleChange}
-                    required
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    /> <br />
+                        name="password"
+                        type="password"
+                        placeholder="Password"
+                        onChange={handleChange}
+                        required
+                        className="input"
+                    />
+
+                    <input
+                        name="phone"
+                        placeholder="Phone Number"
+                        onChange={handleChange}
+                        className="input"
+                    />
+
+                    <input
+                        name="department"
+                        placeholder="Department (IT, Engineering...)"
+                        onChange={handleChange}
+                        className="input"
+                    />
+
+                    {/* User Type */}
+                    <select
+                        name="userType"
+                        value={form.userType}
+                        onChange={handleChange}
+                        className="input"
+                    >
+                        <option value="STUDENT">Student</option>
+                        <option value="STAFF">Staff</option>
+                    </select>
+
+                    {/* Conditional Fields */}
+                    {form.userType === "STUDENT" && (
+                        <input
+                            name="studentId"
+                            placeholder="Student ID"
+                            onChange={handleChange}
+                            required
+                            className="input"
+                        />
+                    )}
+
+                    {form.userType === "STAFF" && (
+                        <input
+                            name="staffId"
+                            placeholder="Staff ID"
+                            onChange={handleChange}
+                            required
+                            className="input"
+                        />
+                    )}
 
                     <button
-                    type="submit"
-                    className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold"
+                        type="submit"
+                        className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold"
                     >
-                    Signup
+                        Signup
                     </button>
 
                 </form>
@@ -79,9 +129,9 @@ function Signup() {
                 </p>
 
             </div>
-
+           
         </div>
-        );
+    );
 }
 
 export default Signup;

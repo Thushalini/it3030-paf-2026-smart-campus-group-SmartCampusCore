@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sliit.campus_core.entity.Role;
+import com.sliit.campus_core.entity.Status;
 import com.sliit.campus_core.entity.User;
+import com.sliit.campus_core.entity.UserType;
 import com.sliit.campus_core.repository.UserRepository;
 
 @Service
@@ -16,7 +18,8 @@ public class UserService {
     private UserRepository repository;
 
     public User getByEmail(String email) {
-        return repository.findByEmail(email).orElseThrow();
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public User createIfNotExists(String name, String email, Role role) {
@@ -25,6 +28,11 @@ public class UserService {
             user.setName(name);
             user.setEmail(email);
             user.setRole(role);
+
+            // 🔹 Default values
+            user.setStatus(Status.ACTIVE);
+            user.setProvider("OAUTH"); // or GOOGLE
+
             return repository.save(user);
         });
     }
@@ -51,11 +59,47 @@ public class UserService {
         User existingUser = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // 🔹 Basic fields
         existingUser.setName(updatedUser.getName());
         existingUser.setEmail(updatedUser.getEmail());
-        existingUser.setRole(updatedUser.getRole());
+        existingUser.setPhone(updatedUser.getPhone());
+        existingUser.setDepartment(updatedUser.getDepartment());
+
+        // 🔹 User type logic
+        existingUser.setUserType(updatedUser.getUserType());
+
+        if (updatedUser.getUserType() == UserType.STUDENT) {
+            if (updatedUser.getStudentId() == null) {
+                throw new RuntimeException("Student ID required");
+            }
+            existingUser.setStudentId(updatedUser.getStudentId());
+            existingUser.setStaffId(null);
+        } 
+        else if (updatedUser.getUserType() == UserType.STAFF) {
+            if (updatedUser.getStaffId() == null) {
+                throw new RuntimeException("Staff ID required");
+            }
+            existingUser.setStaffId(updatedUser.getStaffId());
+            existingUser.setStudentId(null);
+        }
+
+        // 🔹 Optional fields
+        existingUser.setProfileImage(updatedUser.getProfileImage());
+
+        // 🔹 Notification preferences
+        existingUser.setBookingNotifications(updatedUser.isBookingNotifications());
+        existingUser.setTicketNotifications(updatedUser.isTicketNotifications());
+        existingUser.setCommentNotifications(updatedUser.isCommentNotifications());
 
         return repository.save(existingUser);
+    }
+
+    public User updateUserRole(String id, Role role) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setRole(role);
+        return repository.save(user);
     }
 
     // ✅ DELETE user
@@ -65,6 +109,8 @@ public class UserService {
             throw new RuntimeException("User not found");
         }
 
-        repository.deleteById(id);
+        User user = getUserById(id);
+        user.setStatus(Status.DISABLED);
+        repository.save(user);
     }
 }
