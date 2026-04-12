@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
-  const { logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
 
   return (
     <div style={{
@@ -13,15 +13,22 @@ const Navbar = () => {
       justifyContent: "space-between"
     }}>
       <h3>Dashboard</h3>
-      <button onClick={logout} style={{
-        background: "white",
-        color: "#2563eb",
-        border: "none",
-        padding: "8px 12px",
-        cursor: "pointer"
-      }}>
-        Logout
-      </button>
+
+      <div>
+        <span>{user?.email}</span>
+        <span> | {user?.role}</span>
+
+        <button onClick={logout} style={{
+          background: "white",
+          color: "#2563eb",
+          border: "none",
+          padding: "8px 12px",
+          marginLeft: "10px",
+          cursor: "pointer"
+        }}>
+          Logout
+        </button>
+      </div>
     </div>
   );
 };
