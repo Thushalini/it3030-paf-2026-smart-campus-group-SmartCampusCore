@@ -37,19 +37,19 @@ function AdminManageUsers() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl p-6">
-        
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 p-6">
+      <div className="max-w-7xl mx-auto bg-white shadow-2xl rounded-2xl p-6">
+
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+          <h2 className="text-3xl font-bold text-gray-800">
             User Management
           </h2>
 
           <input
             type="text"
-            placeholder="Search users..."
-            className="border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Search by name or email..."
+            className="border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 w-full md:w-80"
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
@@ -61,8 +61,11 @@ function AdminManageUsers() {
               <tr className="bg-gray-200 text-left text-gray-700">
                 <th className="p-3">Name</th>
                 <th className="p-3">Email</th>
+                <th className="p-3">Type</th>
+                <th className="p-3">Department</th>
                 <th className="p-3">Role</th>
-                <th className="p-3">Update</th>
+                <th className="p-3">Status</th>
+                <th className="p-3">Update Role</th>
               </tr>
             </thead>
 
@@ -80,6 +83,16 @@ function AdminManageUsers() {
                     {user.email}
                   </td>
 
+                  <td className="p-3 text-sm">
+                    <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+                      {user.userType || "N/A"}
+                    </span>
+                  </td>
+
+                  <td className="p-3 text-gray-600">
+                    {user.department || "-"}
+                  </td>
+
                   <td className="p-3">
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -91,6 +104,18 @@ function AdminManageUsers() {
                       }`}
                     >
                       {user.role}
+                    </span>
+                  </td>
+
+                  <td className="p-3">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm ${
+                        user.status === "ACTIVE"
+                          ? "bg-green-100 text-green-600"
+                          : "bg-gray-200 text-gray-600"
+                      }`}
+                    >
+                      {user.status}
                     </span>
                   </td>
 
@@ -113,7 +138,7 @@ function AdminManageUsers() {
               {filteredUsers.length === 0 && (
                 <tr>
                   <td
-                    colSpan="4"
+                    colSpan="7"
                     className="text-center py-6 text-gray-500"
                   >
                     No users found
