@@ -4,6 +4,7 @@ public class SignupRequest {
     public String name;
     public String email;
     public String password;
+    public String role;
 
     public String getName() {
         return name;
@@ -24,6 +25,13 @@ public class SignupRequest {
     }
     public String getPassword() {
         return password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+    public void setRole(String role) {
+        this.role = role;
     }
 
 }

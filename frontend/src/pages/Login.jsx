@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { loginUser } from "../api/authService";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 function Login() {
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const [form, setForm] = useState({
         email: "",
@@ -22,12 +24,27 @@ function Login() {
 
         try {
             const res = await loginUser(form);
-            localStorage.setItem("token", res.data.token);
+
+            console.log("LOGIN RESPONSE:", res.data);
+
+            // ✅ FIX: use context instead of manual localStorage
+            login(res.data);
 
             alert("Login successful!");
-            navigate("/dashboard");
+
+            // Optional: role-based redirect
+            const role = res.data.role;
+
+            if (role === "ADMIN") {
+                navigate("/admin");
+            } else if (role === "TECHNICIAN") {
+                navigate("/technician");
+            } else {
+                navigate("/user");
+            }
 
         } catch (err) {
+            console.error(err);
             alert("Invalid email or password");
         }
     };

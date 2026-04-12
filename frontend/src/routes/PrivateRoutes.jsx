@@ -1,11 +1,22 @@
 import { useContext } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ children, allowedRoles }) => {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
 
-  return user ? children : <Navigate to="/" />;
+  // ❌ Not logged in
+  if (!user) {
+    return <Navigate to="/" state={{ from: location }} />;
+  }
+
+  // 🔐 Role check
+  if (allowedRoles && user.role !== "ADMIN" && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return children;
 };
 
 export default PrivateRoute;

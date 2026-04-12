@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { signupUser } from "../api/authService";
 import { useNavigate } from "react-router-dom";
 
@@ -8,7 +8,8 @@ function Signup() {
     const [form, setForm] = useState({
         name: "",
         email: "",
-        password: ""
+        password: "",
+        role: "USER" // default role
     });
 
     const handleChange = (e) => {
@@ -20,7 +21,7 @@ function Signup() {
         try {
             await signupUser(form);
             alert("Signup successful!");
-            navigate("/");
+            navigate("/dashboard");
         } catch (err) {
             alert("Error signing up");
         }
@@ -61,6 +62,17 @@ function Signup() {
                     required
                     className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     /> <br />
+
+                    <select
+                        name="role"
+                        onChange={handleChange}
+                        value={form.role}
+                        className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    >
+                        <option value="USER">User</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="TECHNICIAN">Technician</option>
+                    </select> <br />
 
                     <button
                     type="submit"
