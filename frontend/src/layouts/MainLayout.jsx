@@ -1,13 +1,23 @@
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import { Outlet } from "react-router-dom";
 
-const MainLayout = ({ children }) => {
+const MainLayout = () => {
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      
+      {/* Sidebar */}
       <Sidebar />
-      <div style={{ flex: 1 }}>
+
+      {/* Main content */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        
         <Navbar />
-        <div style={{ padding: "20px" }}>{children}</div>
+
+        <div style={{ padding: "20px", flex: 1 }}>
+          <Outlet /> {/* 🔥 THIS FIXES EVERYTHING */}
+        </div>
+
       </div>
     </div>
   );

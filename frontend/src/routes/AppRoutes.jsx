@@ -2,13 +2,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./PrivateRoutes";
 import MainLayout from "../layouts/MainLayout";
 
-import UserPage from "../pages/UserPage";
-import TechnicianPage from "../pages/TechnicianPage";
-import AdminPage from "../pages/AdminPage";
-
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Signup from "../pages/Signup";
+
+import UserPage from "../pages/UserPage";
+import TechnicianPage from "../pages/TechnicianPage";
+import AdminPage from "../pages/AdminPage";
+import AdminManageUsers from "../pages/AdminManageUsers";
+
 
 const AppRoutes = () => {
   return (
@@ -54,14 +56,13 @@ const AppRoutes = () => {
           path="/admin"
           element={
             <PrivateRoute allowedRoles={["ADMIN"]}>
-              <MainLayout>
-                <AdminPage />
-              </MainLayout>
+              <MainLayout />
             </PrivateRoute>
           }
-        />
-
-
+        >
+          <Route index element={<AdminPage />} />
+          <Route path="manage-users" element={<AdminManageUsers />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -9,7 +9,6 @@ function Signup() {
         name: "",
         email: "",
         password: "",
-        role: "USER" // default role
     });
 
     const handleChange = (e) => {
@@ -62,17 +61,6 @@ function Signup() {
                     required
                     className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     /> <br />
-
-                    <select
-                        name="role"
-                        onChange={handleChange}
-                        value={form.role}
-                        className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    >
-                        <option value="USER">User</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="TECHNICIAN">Technician</option>
-                    </select> <br />
 
                     <button
                     type="submit"

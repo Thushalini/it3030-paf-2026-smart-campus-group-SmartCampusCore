@@ -12,8 +12,12 @@ const PrivateRoute = ({ children, allowedRoles }) => {
   }
 
   // 🔐 Role check
-  if (allowedRoles && user.role !== "ADMIN" && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/dashboard" />;
+  }
+
+  if (user === undefined) {
+    return <div>Loading...</div>;
   }
 
   return children;
