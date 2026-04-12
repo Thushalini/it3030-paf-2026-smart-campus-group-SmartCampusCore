@@ -18,8 +18,8 @@ const Sidebar = () => {
 
       <ul style={{ listStyle: "none", padding: 0 }}>
 
-        {/* COMMON */}
-        <li><Link to="/dashboard" style={{ color: "white" }}>Dashboard</Link></li>
+        {/* COMMON
+        <li><Link to="/dashboard" style={{ color: "white" }}>Dashboard</Link></li> */}
 
         {/* 👤 USER */}
         {role === "USER" && (
@@ -39,8 +39,23 @@ const Sidebar = () => {
         {/* 👑 ADMIN */}
         {role === "ADMIN" && (
           <>
-            <li><Link to="/admin" style={{ color: "white" }}>Admin Panel</Link></li>
-            <li><Link to="/manage-users" style={{ color: "white" }}>Manage Users</Link></li>
+            <li>
+              <Link 
+                to="/admin" 
+                className="block px-3 py-2 rounded hover:bg-blue-700"
+              >
+                Admin Panel
+              </Link>
+            </li>
+
+            <li>
+              <Link 
+                to="/admin/manage-users" 
+                className="block px-3 py-2 rounded hover:bg-blue-700"
+              >
+                Manage Users
+              </Link>
+            </li>
           </>
         )}
 

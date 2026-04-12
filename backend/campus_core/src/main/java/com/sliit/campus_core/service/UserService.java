@@ -19,12 +19,12 @@ public class UserService {
         return repository.findByEmail(email).orElseThrow();
     }
 
-    public User createIfNotExists(String name, String email) {
+    public User createIfNotExists(String name, String email, Role role) {
         return repository.findByEmail(email).orElseGet(() -> {
             User user = new User();
             user.setName(name);
             user.setEmail(email);
-            user.setRole(Role.USER);
+            user.setRole(role);
             return repository.save(user);
         });
     }

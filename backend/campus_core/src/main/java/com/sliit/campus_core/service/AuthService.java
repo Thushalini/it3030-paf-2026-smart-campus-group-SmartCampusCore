@@ -47,4 +47,14 @@ public class AuthService {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
         return Map.of("token", token, "role", user.getRole().name(), "name", user.getName());
     }
+
+    public User assignRole(String userId, Role role) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setRole(role);
+
+        return userRepository.save(user);
+    }
 }
