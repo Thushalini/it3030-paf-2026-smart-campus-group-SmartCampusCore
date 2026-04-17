@@ -5,19 +5,31 @@ import com.sliit.campus_core.dto.ticket.TicketAssignRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketCreateRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketResponseDTO;
 import com.sliit.campus_core.dto.ticket.TicketUpdateStatusRequestDTO;
+import com.sliit.campus_core.ticket.exception.MaxAttachmentsExceededException;
+import com.sliit.campus_core.ticket.service.FileStorageService;
 import com.sliit.campus_core.ticket.service.TicketService;
 import jakarta.validation.Valid;
 
-import java.nio.file.attribute.UserPrincipal;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/tickets")
@@ -29,6 +41,9 @@ public class TicketController {
     public TicketController(TicketService ticketService) {
         this.ticketService = ticketService;
     }
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
     // POST /api/v1/tickets → create a new ticket
     @PostMapping
@@ -85,5 +100,59 @@ public class TicketController {
         return ResponseEntity.ok(ApiResponse.success("Technician assigned successfully", response));
     }
 
+    @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<?>> uploadAttachments(
+            @PathVariable String id,
+            @RequestParam(required = false) MultiValueMap<String, MultipartFile> fileMap,
+            HttpServletRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        List<MultipartFile> files = new ArrayList<>();
+        List<Part> fileParts = new ArrayList<>();
+
+        if (fileMap != null && !fileMap.isEmpty()) {
+            fileMap.values().forEach(files::addAll);
+        }
+
+        if (files.isEmpty()) {
+            try {
+                if (request.getContentType() == null || !request.getContentType().toLowerCase().contains("multipart/form-data")) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Request is not multipart/form-data. Ensure the request body is form-data with file fields.");
+                }
+
+                for (Part part : request.getParts()) {
+                    if (part.getSubmittedFileName() != null && part.getSize() > 0) {
+                        fileParts.add(part);
+                    }
+                }
+            } catch (IOException | ServletException ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Unable to parse multipart file parts", ex);
+            }
+        }
+
+        if (files.isEmpty() && fileParts.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No files part found in the request. Use multipart/form-data with file fields.");
+        }
+
+        if (!files.isEmpty() && files.size() > 3) {
+            throw new MaxAttachmentsExceededException("Cannot upload more than 3 images");
+        }
+        if (!fileParts.isEmpty() && fileParts.size() > 3) {
+            throw new MaxAttachmentsExceededException("Cannot upload more than 3 images");
+        }
+
+        List<String> urls = new ArrayList<>();
+        if (!files.isEmpty()) {
+            urls.addAll(files.stream().map(fileStorageService::storeFile).toList());
+        } else {
+            fileParts.forEach(part -> urls.add(fileStorageService.storeFile(part)));
+        }
+
+        // TODO: update ticket entity with these URLs (ticketService method)
+        return ResponseEntity.ok(ApiResponse.success("Files uploaded successfully", urls));
+    }
 
 }
