@@ -1,9 +1,21 @@
 package com.sliit.campus_core.service;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.util.Value;
 import com.sliit.campus_core.dto.LoginRequest;
 import com.sliit.campus_core.dto.SignupRequest;
 import com.sliit.campus_core.entity.Role;
@@ -13,14 +25,24 @@ import com.sliit.campus_core.entity.UserType;
 import com.sliit.campus_core.repository.UserRepository;
 import com.sliit.campus_core.security.JwtUtil;
 
-import java.util.Map;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class AuthService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtUtil jwtUtil;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
+
+    @PostConstruct
+    public void debug() {
+        System.out.println("GOOGLE CLIENT ID = " + googleClientId);
+    }
 
     public Map<String, String> signup(SignupRequest request) {
 
@@ -103,6 +125,11 @@ public class AuthService {
         return Map.of("token", token, "role", user.getRole().name(), "name", user.getName());
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     public User assignRole(String userId, Role role) {
 
         User user = userRepository.findById(userId)
@@ -112,4 +139,58 @@ public class AuthService {
 
         return userRepository.save(user);
     }
+    
+    public Map<String, String> googleLogin(String token) {
+
+        try {
+
+            if (googleClientId == null || googleClientId.isBlank()) {
+                throw new RuntimeException("Google Client ID not configured");
+            }
+
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    new NetHttpTransport(),
+                    GsonFactory.getDefaultInstance()
+            )
+            .setAudience(Collections.singletonList(googleClientId))
+            .build();
+
+            GoogleIdToken idToken = verifier.verify(token);
+
+            if (idToken == null) {
+                throw new RuntimeException("Invalid Google token");
+            }
+
+            GoogleIdToken.Payload payload = idToken.getPayload();
+
+            String email = payload.getEmail();
+            String name = (String) payload.get("name");
+
+            User user = userRepository.findByEmail(email)
+                    .orElseGet(() -> {
+                        User newUser = new User();
+                        newUser.setEmail(email);
+                        newUser.setName(name);
+                        newUser.setPassword("");
+                        newUser.setRole(Role.USER);
+                        newUser.setUserType(UserType.STUDENT);
+                        newUser.setStatus(Status.ACTIVE);
+                        newUser.setProvider("GOOGLE");
+                        return userRepository.save(newUser);
+                    });
+
+            String jwt = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+
+            return Map.of(
+                    "token", jwt,
+                    "role", user.getRole().name(),
+                    "name", user.getName()
+            );
+
+        } catch (IOException | RuntimeException | GeneralSecurityException e) {
+            logger.error("Google login failed", e);
+            throw new RuntimeException("Google login failed: " + e.getMessage());
+        }
+    }
+
 }

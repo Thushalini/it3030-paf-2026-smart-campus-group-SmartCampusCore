@@ -1,7 +1,11 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { loginUser } from "../api/authService";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import axios from "axios";
+
+import { GoogleLogin } from "@react-oauth/google";
+// import { jwtDecode } from "jwt-decode";
 
 function Login() {
     const navigate = useNavigate();
@@ -12,7 +16,14 @@ function Login() {
         password: ""
     });
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    // -------------------------
+    // Normal login
+    // -------------------------
     const handleChange = (e) => {
+        setError("");
         setForm({
             ...form,
             [e.target.name]: e.target.value
@@ -21,32 +32,55 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         try {
             const res = await loginUser(form);
+            localStorage.setItem("token", res.data.token);
 
-            console.log("LOGIN RESPONSE:", res.data);
-
-            // ✅ FIX: use context instead of manual localStorage
             login(res.data);
 
-            alert("Login successful!");
-
-            // Optional: role-based redirect
             const role = res.data.role;
 
-            if (role === "ADMIN") {
-                navigate("/admin");
-            } else if (role === "TECHNICIAN") {
-                navigate("/technician");
-            } else {
-                navigate("/user");
-            }
+            if (role === "ADMIN") navigate("/admin", { replace: true });
+            else if (role === "TECHNICIAN") navigate("/technician", { replace: true });
+            else navigate("/dashboard", { replace: true });
 
         } catch (err) {
             console.error(err);
-            alert("Invalid email or password");
+            setError("Invalid email or password");
+        } finally {
+            setLoading(false);
         }
+    };
+
+    // -------------------------
+    // Google login success
+    // -------------------------
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const googleToken = credentialResponse.credential;
+
+            const res = await axios.post(
+            "http://localhost:8080/api/auth/google",
+            { token: googleToken }
+            );
+
+            console.log("Google login response:", res.data);
+
+            localStorage.setItem("token", res.data.token);
+            login(res.data);
+
+            navigate("/dashboard", { replace: true });
+
+        } catch (err) {
+            console.error("Google login error:", err);
+            setError("Google login failed");
+        }
+    };
+
+    const handleGoogleError = () => {
+        setError("Google login failed");
     };
 
     return (
@@ -57,11 +91,19 @@ function Login() {
                     Welcome Back
                 </h2>
 
+                {/* Error message */}
+                {error && (
+                    <p className="text-red-500 text-sm text-center mb-3">
+                        {error}
+                    </p>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-4">
 
                     <input
                         name="email"
                         placeholder="Email"
+                        autoComplete="email"
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -71,6 +113,7 @@ function Login() {
                         name="password"
                         type="password"
                         placeholder="Password"
+                        autoComplete="current-password"
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -78,14 +121,27 @@ function Login() {
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+                        disabled={loading}
+                        className={`w-full text-white py-2 rounded-lg transition duration-300 
+                        ${loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"}`}
                     >
-                        Login
+                        {loading ? "Logging in..." : "Login"}
                     </button>
                 </form>
 
+                {/* Divider */}
+                <div className="my-4 text-center text-gray-400">OR</div>
+
+                {/* Google Login */}
+                <div className="flex justify-center">
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={handleGoogleError}
+                    />
+                </div>
+
                 <p
-                    className="text-center text-sm text-gray-600 mt-4 cursor-pointer hover:text-blue-600"
+                    className="text-center text-sm text-gray-600 mt-6 cursor-pointer hover:text-blue-600"
                     onClick={() => navigate("/signup")}
                 >
                     Don't have an account? Signup

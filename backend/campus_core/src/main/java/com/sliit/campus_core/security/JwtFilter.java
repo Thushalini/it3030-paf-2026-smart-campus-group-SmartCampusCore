@@ -28,16 +28,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
+
         String path = request.getRequestURI();
-        boolean skip = path.startsWith("/api/auth")
-                    || path.startsWith("/oauth2")
-                    || path.startsWith("/favicon.ico")
-                    || path.startsWith("/static/")
-                    || path.startsWith("/assets/");
-        if (skip) {
-            log.debug("JwtFilter.skip for path={}", path);
-        }
-        return skip;
+
+        return path.equals("/api/auth/login")
+            || path.equals("/api/auth/signup")
+            || path.equals("/api/auth/google")
+            || path.startsWith("/oauth2")
+            || path.startsWith("/favicon.ico")
+            || path.startsWith("/static/")
+            || path.startsWith("/assets/");
     }
 
     @Override
@@ -89,6 +89,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 sendUnauthorized(response, "Token invalid or authentication failed");
                 return;
             }
+
+            System.out.println("Authorization header: " + authHeader);
+            System.out.println("Token: " + token);
+            System.out.println("Email: " + email);
         } else if (token == null) {
             log.debug("JwtFilter: no Bearer token found in Authorization header");
         }
@@ -112,4 +116,5 @@ public class JwtFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.getWriter().write("{\"error\":\"" + message + "\"}");
     }
+
 }
