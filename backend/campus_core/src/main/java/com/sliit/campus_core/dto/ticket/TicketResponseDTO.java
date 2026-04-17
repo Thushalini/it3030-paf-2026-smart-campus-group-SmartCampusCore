@@ -1,11 +1,13 @@
 package com.sliit.campus_core.dto.ticket;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sliit.campus_core.ticket.model.enums.TicketCategory;
 import com.sliit.campus_core.ticket.model.enums.TicketPriority;
 import com.sliit.campus_core.ticket.model.enums.TicketStatus;
 import lombok.Data;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -24,6 +26,9 @@ public class TicketResponseDTO {
     private ContactDetailsDTO contactDetails;
     private List<String> imageUrls;
 
+    private String assignedToId;
+    private String assignedToName;
+
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -31,6 +36,17 @@ public class TicketResponseDTO {
     private String slaFirstResponseDisplay;
     private String slaResolutionDisplay;
     private Boolean slaBreached;
+
+    @JsonProperty("firstResponseAt")
+    private LocalDateTime firstResponseAt;
+    
+    @JsonProperty("firstResponseTimeMinutes")
+    private Long firstResponseTimeMinutes;
+
+    private LocalDateTime resolvedAt;
+    private Long resolutionTimeMinutes;
+    private String resolutionNote;
+    private String rejectionReason;
 
     private Integer commentsCount;  
 }

@@ -14,7 +14,6 @@ import java.util.List;
 
 @Document(collection = "tickets")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Ticket {
