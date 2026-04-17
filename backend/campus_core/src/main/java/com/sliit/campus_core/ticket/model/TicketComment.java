@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Document(collection = "ticket_comments")
@@ -24,10 +25,10 @@ public class TicketComment {
     private String authorRole;
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     private boolean isEdited;
     private boolean isDeleted;
