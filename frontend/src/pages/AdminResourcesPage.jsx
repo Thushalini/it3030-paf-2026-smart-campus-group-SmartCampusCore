@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { deleteResource, getResources } from "../api/resourcesApi";
 import "./AdminResourcesPage.css";
@@ -39,6 +39,16 @@ function AdminResourcesPage() {
     }
   };
 
+  const stats = useMemo(() => {
+    const total = resources.length;
+    const active = resources.filter((r) => r.status === "ACTIVE").length;
+    const outOfService = resources.filter((r) => r.status === "OUT_OF_SERVICE").length;
+    const maintenance = resources.filter((r) => r.status === "UNDER_MAINTENANCE").length;
+    const totalCapacity = resources.reduce((sum, r) => sum + (r.capacity || 0), 0);
+
+    return { total, active, outOfService, maintenance, totalCapacity };
+  }, [resources]);
+
   return (
     <div className="admin-resources-page">
       <div className="admin-header">
@@ -47,10 +57,45 @@ function AdminResourcesPage() {
           <p>Manage all campus resources, update details, and remove outdated entries.</p>
         </div>
 
-        <Link to="/admin/resources/new" className="add-resource-button">
-          + Add New Resource
-        </Link>
+        <div className="admin-header-actions">
+          <Link to="/admin/resources/new" className="add-resource-button">
+            + Add New Resource
+          </Link>
+
+          <Link to="/admin/resources/analytics" className="analytics-button">
+            View Analytics
+          </Link>
+        </div>
       </div>
+
+      {!loading && !error && (
+        <div className="admin-summary-cards">
+          <div className="summary-card">
+            <h4>Total Resources</h4>
+            <p>{stats.total}</p>
+          </div>
+
+          <div className="summary-card">
+            <h4>Active</h4>
+            <p>{stats.active}</p>
+          </div>
+
+          <div className="summary-card">
+            <h4>Out of Service</h4>
+            <p>{stats.outOfService}</p>
+          </div>
+
+          <div className="summary-card">
+            <h4>Maintenance</h4>
+            <p>{stats.maintenance}</p>
+          </div>
+
+          <div className="summary-card">
+            <h4>Total Capacity</h4>
+            <p>{stats.totalCapacity}</p>
+          </div>
+        </div>
+      )}
 
       {loading && <p className="admin-status-message">Loading resources...</p>}
       {error && <p className="admin-status-message error">{error}</p>}
@@ -86,6 +131,10 @@ function AdminResourcesPage() {
                       }
                       alt={resource.name}
                       className="admin-resource-thumb"
+                      onError={(e) => {
+                        e.target.src =
+                          "https://images.unsplash.com/photo-1497366412874-3415097a27e7";
+                      }}
                     />
                   </td>
 
@@ -110,6 +159,13 @@ function AdminResourcesPage() {
 
                   <td>
                     <div className="admin-action-buttons">
+                      <Link
+                        to={`/admin/resources/view/${resource.id}`}
+                        className="view-admin-button"
+                      >
+                        View
+                      </Link>
+
                       <Link
                         to={`/admin/resources/edit/${resource.id}`}
                         className="edit-button"

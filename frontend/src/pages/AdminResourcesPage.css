@@ -1,3 +1,13 @@
+.admin-header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.analytics-button:hover {
+  background: #059669;
+}
+
 .admin-resources-page {
   min-height: 100vh;
   background: #f7f9fc;
@@ -120,6 +130,29 @@
   color: #b91c1c;
 }
 
+.view-admin-button {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+}
+
+
+.analytics-button {
+   display: inline-block;
+  margin-left: 10px;
+  background: #10b981;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
 .admin-status-message {
   text-align: center;
   margin-top: 30px;
@@ -128,4 +161,38 @@
 
 .admin-status-message.error {
   color: #dc2626;
+}
+
+.admin-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.summary-card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.summary-card h4 {
+  margin: 0 0 10px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.summary-card p {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
 }

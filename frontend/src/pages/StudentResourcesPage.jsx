@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { getResources } from "../api/resourcesApi";
 import "./StudentResourcesPage.css";
@@ -39,26 +39,83 @@ function StudentResourcesPage() {
   const filterResources = () => {
     let filtered = [...resources];
 
-    if (search) {
+    if (search && search.trim() !== "") {
+      const searchValue = search.toLowerCase().trim();
+
       filtered = filtered.filter((resource) =>
-        resource.name?.toLowerCase().includes(search.toLowerCase()) ||
-        resource.description?.toLowerCase().includes(search.toLowerCase()) ||
-        resource.resourceCode?.toLowerCase().includes(search.toLowerCase())
+        (resource.name && resource.name.toLowerCase().includes(searchValue)) ||
+        (resource.description && resource.description.toLowerCase().includes(searchValue)) ||
+        (resource.resourceCode && resource.resourceCode.toLowerCase().includes(searchValue))
       );
     }
 
-    if (type) {
-      filtered = filtered.filter((resource) => resource.type === type);
+    if (type && type.trim() !== "") {
+      filtered = filtered.filter(
+        (resource) => resource.type && resource.type === type
+      );
     }
 
-    if (location) {
+    if (location && location.trim() !== "") {
+      const locationValue = location.toLowerCase().trim();
+
       filtered = filtered.filter((resource) =>
-        resource.location?.toLowerCase().includes(location.toLowerCase()) ||
-        resource.building?.toLowerCase().includes(location.toLowerCase())
+        (resource.location && resource.location.toLowerCase().includes(locationValue)) ||
+        (resource.building && resource.building.toLowerCase().includes(locationValue))
       );
     }
 
     setFilteredResources(filtered);
+  };
+
+  const topRatedResource = useMemo(() => {
+    if (!resources.length) return null;
+    return [...resources].sort(
+      (a, b) => (b.ratingAverage || 0) - (a.ratingAverage || 0)
+    )[0];
+  }, [resources]);
+
+  const mostPopularResource = useMemo(() => {
+    if (!resources.length) return null;
+    return [...resources].sort(
+      (a, b) => (b.bookingCount || 0) - (a.bookingCount || 0)
+    )[0];
+  }, [resources]);
+
+  const renderFeatureCard = (title, resource, badgeClass, badgeText) => {
+    if (!resource) return null;
+
+    return (
+      <div className="feature-card">
+        <div className={`feature-badge ${badgeClass}`}>{badgeText}</div>
+        <img
+          src={
+            resource.imageUrl ||
+            "https://images.unsplash.com/photo-1497366412874-3415097a27e7"
+          }
+          alt={resource.name}
+          className="feature-image"
+          onError={(e) => {
+            e.target.src =
+              "https://images.unsplash.com/photo-1497366412874-3415097a27e7";
+          }}
+        />
+        <div className="feature-content">
+          <h3>{title}</h3>
+          <h2>{resource.name}</h2>
+          <p>{resource.description}</p>
+          <div className="feature-meta">
+            <span><strong>Type:</strong> {resource.type?.replaceAll("_", " ")}</span>
+            <span><strong>Capacity:</strong> {resource.capacity}</span>
+            <span><strong>Location:</strong> {resource.location}</span>
+            <span><strong>Rating:</strong> {resource.ratingAverage ?? 0}</span>
+            <span><strong>Bookings:</strong> {resource.bookingCount ?? 0}</span>
+          </div>
+          <Link to={`/student/resources/${resource.id}`} className="feature-button">
+            Explore Details
+          </Link>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -95,6 +152,27 @@ function StudentResourcesPage() {
       {loading && <p className="status-message">Loading resources...</p>}
       {error && <p className="status-message error">{error}</p>}
 
+      {!loading && !error && resources.length > 0 && (
+        <div className="featured-section">
+          <h2>Featured Resource Insights</h2>
+          <div className="featured-grid">
+            {renderFeatureCard(
+              "Top Rated Resource",
+              topRatedResource,
+              "badge-rated",
+              "Top Rated"
+            )}
+
+            {renderFeatureCard(
+              "Most Popular Resource",
+              mostPopularResource,
+              "badge-popular",
+              "Most Popular"
+            )}
+          </div>
+        </div>
+      )}
+
       {!loading && !error && filteredResources.length === 0 && (
         <p className="status-message">No resources found.</p>
       )}
@@ -111,6 +189,10 @@ function StudentResourcesPage() {
                 }
                 alt={resource.name}
                 className="resource-image"
+                onError={(e) => {
+                  e.target.src =
+                    "https://images.unsplash.com/photo-1497366412874-3415097a27e7";
+                }}
               />
 
               <div className="resource-card-content">
@@ -122,19 +204,18 @@ function StudentResourcesPage() {
                   <span><strong>Code:</strong> {resource.resourceCode}</span>
                   <span><strong>Capacity:</strong> {resource.capacity}</span>
                   <span><strong>Location:</strong> {resource.location}</span>
-                  <div
-                      className={`status-badge ${
-                        resource.status === "ACTIVE"
-                            ? "status-active"
-                            : resource.status === "OUT_OF_SERVICE"
-                            ? "status-out"
-                            : "status-maintenance"
-                      }`}
-                  >
-                      {resource.status}
-                  </div>
+                </div>
 
-
+                <div
+                  className={`status-badge ${
+                    resource.status === "ACTIVE"
+                      ? "status-active"
+                      : resource.status === "OUT_OF_SERVICE"
+                      ? "status-out"
+                      : "status-maintenance"
+                  }`}
+                >
+                  {resource.status}
                 </div>
 
                 <Link to={`/student/resources/${resource.id}`} className="view-button">

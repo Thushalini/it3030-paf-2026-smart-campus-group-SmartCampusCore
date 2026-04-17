@@ -1,0 +1,57 @@
+.analytics-page {
+  padding: 30px;
+  background: #f7f9fc;
+  min-height: 100vh;
+}
+
+.analytics-page h1 {
+  margin-bottom: 8px;
+}
+
+.analytics-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.card h3 {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.card p {
+  font-size: 24px;
+  font-weight: bold;
+  color: #111827;
+}
+
+.analytics-table {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.analytics-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.analytics-table th,
+.analytics-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.analytics-loading {
+  text-align: center;
+  margin-top: 50px;
+}
