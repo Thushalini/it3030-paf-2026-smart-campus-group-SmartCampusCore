@@ -15,6 +15,8 @@ public class TicketResponseDTO {
     private String id;
     private String ticketNumber;
     private String title;
+    private String resourceId;
+    private String resourceName;
     private String location;
     private TicketCategory category;
     private String description;
