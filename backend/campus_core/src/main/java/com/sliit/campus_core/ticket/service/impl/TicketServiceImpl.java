@@ -1,12 +1,16 @@
 package com.sliit.campus_core.ticket.service.impl;
 
 import com.sliit.campus_core.dto.ticket.ContactDetailsDTO;
+import com.sliit.campus_core.dto.ticket.TicketAnalyticsDTO;
 import com.sliit.campus_core.dto.ticket.TicketAssignRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketCreateRequestDTO;
+import com.sliit.campus_core.dto.ticket.TicketFilterRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketResponseDTO;
 import com.sliit.campus_core.dto.ticket.TicketUpdateStatusRequestDTO;
 import com.sliit.campus_core.ticket.model.Ticket;
 import com.sliit.campus_core.ticket.model.TicketStatusHistory;
+import com.sliit.campus_core.ticket.model.enums.TicketCategory;
+import com.sliit.campus_core.ticket.model.enums.TicketPriority;
 import com.sliit.campus_core.ticket.model.enums.TicketStatus;
 import com.sliit.campus_core.ticket.repository.TicketRepository;
 import com.sliit.campus_core.ticket.repository.TicketStatusHistoryRepository;
@@ -27,6 +31,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+import java.util.List;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -55,6 +61,8 @@ private TicketStatusHistoryRepository ticketStatusHistoryRepository;
                                         String reportedByEmail) {
         Ticket ticket = new Ticket();
         ticket.setTitle(dto.getTitle());
+        ticket.setResourceId(dto.getResourceId());
+        ticket.setResourceName(dto.getResourceName());
         ticket.setLocation(dto.getLocation());
         ticket.setCategory(dto.getCategory());
         ticket.setDescription(dto.getDescription());
@@ -74,7 +82,7 @@ private TicketStatusHistoryRepository ticketStatusHistoryRepository;
         ticket.setUpdatedAt(Instant.now());
 
         Ticket saved = ticketRepository.save(ticket);
-        return toResponseDTO(saved);
+        return ticketMapper.toResponseDTO(saved);
     }
 
     @Override
@@ -90,13 +98,13 @@ private TicketStatusHistoryRepository ticketStatusHistoryRepository;
             throw new RuntimeException("Unauthorized access to ticket");
         }
 
-        return toResponseDTO(ticket);
+        return ticketMapper.toResponseDTO(ticket);
     }
 
     @Override
     public Page<TicketResponseDTO> getMyTickets(String currentUserId, Pageable pageable) {
         return ticketRepository.findByReportedByIdOrderByCreatedAtDesc(currentUserId, pageable)
-                .map(this::toResponseDTO);
+                .map(ticketMapper::toResponseDTO);
     }
 
     @Override
@@ -177,6 +185,74 @@ private TicketStatusHistoryRepository ticketStatusHistoryRepository;
         notificationPublisher.publishTechnicianAssigned(ticket);
 
         return ticketMapper.toResponseDTO(ticket);
+    }
+
+    @Override
+    public Page<TicketResponseDTO> getAllTickets(TicketFilterRequestDTO filter,
+                                                String currentUserId,
+                                                String currentRole,
+                                                Pageable pageable) {
+        // TODO: integrate with Member 4’s JWT claims for real userId/role
+        if ("TECHNICIAN".equalsIgnoreCase(currentRole)) {
+            filter.setAssignedToId(currentUserId);
+        }
+
+        // Build dynamic query (simplified for now)
+        return ticketRepository.findAll(pageable)
+                .map(this::toResponseDTO);
+    }
+
+    @Override
+    public TicketAnalyticsDTO getTicketAnalytics() {
+        TicketAnalyticsDTO dto = new TicketAnalyticsDTO();
+        dto.setTotalTickets(ticketRepository.count());
+
+        // Basic counts
+        dto.setByStatus(Map.of(
+                "OPEN", ticketRepository.countByStatus(TicketStatus.OPEN),
+                "IN_PROGRESS", ticketRepository.countByStatus(TicketStatus.IN_PROGRESS),
+                "RESOLVED", ticketRepository.countByStatus(TicketStatus.RESOLVED),
+                "CLOSED", ticketRepository.countByStatus(TicketStatus.CLOSED),
+                "REJECTED", ticketRepository.countByStatus(TicketStatus.REJECTED)
+        ));
+
+        dto.setByPriority(Map.of(
+                "HIGH", ticketRepository.countByPriority(TicketPriority.HIGH),
+                "MEDIUM", ticketRepository.countByPriority(TicketPriority.MEDIUM),
+                "LOW", ticketRepository.countByPriority(TicketPriority.LOW)
+        ));
+
+        dto.setByCategory(Map.of(
+            "ELECTRICAL", ticketRepository.countByCategory(TicketCategory.ELECTRICAL),
+            "PLUMBING", ticketRepository.countByCategory(TicketCategory.PLUMBING),
+            "IT_EQUIPMENT", ticketRepository.countByCategory(TicketCategory.IT_EQUIPMENT),
+            "FURNITURE", ticketRepository.countByCategory(TicketCategory.FURNITURE),
+            "HVAC", ticketRepository.countByCategory(TicketCategory.HVAC),
+            "SAFETY", ticketRepository.countByCategory(TicketCategory.SAFETY),
+            "OTHER", ticketRepository.countByCategory(TicketCategory.OTHER)
+        ));
+
+
+
+        // TODO: compute averages with Mongo aggregation
+        dto.setAvgFirstResponseMinutes(0.0);
+        dto.setAvgResolutionMinutes(0.0);
+        dto.setSlaBreachRate(0.0);
+
+        // TODO: integrate with Member 1’s resource API for topReportedResources
+        dto.setTopReportedResources(List.of());
+
+        return dto;
+    }
+
+    @Override
+    public Page<TicketResponseDTO> getTicketsByResource(String resourceId,
+                                                        String currentUserId,
+                                                        String currentRole,
+                                                        Pageable pageable) {
+        // TODO: confirm with Member 1 whether they poll this endpoint or you push updates
+        return ticketRepository.findByResourceId(resourceId, pageable)
+                .map(ticketMapper::toResponseDTO);
     }
 
     private TicketResponseDTO toResponseDTO(Ticket ticket) {

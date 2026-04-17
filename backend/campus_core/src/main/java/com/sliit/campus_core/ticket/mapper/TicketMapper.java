@@ -17,6 +17,8 @@ public class TicketMapper {
         dto.setId(ticket.getId());
         dto.setTicketNumber(ticket.getTicketNumber());
         dto.setTitle(ticket.getTitle());
+        dto.setResourceId(ticket.getResourceId());
+        dto.setResourceName(ticket.getResourceName());
         dto.setLocation(ticket.getLocation());
         dto.setCategory(ticket.getCategory());
         dto.setDescription(ticket.getDescription());

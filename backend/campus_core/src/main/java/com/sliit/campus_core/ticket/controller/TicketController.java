@@ -1,11 +1,16 @@
 package com.sliit.campus_core.ticket.controller;
 
 import com.sliit.campus_core.dto.ApiResponse;
+import com.sliit.campus_core.dto.ticket.TicketAnalyticsDTO;
 import com.sliit.campus_core.dto.ticket.TicketAssignRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketCreateRequestDTO;
+import com.sliit.campus_core.dto.ticket.TicketFilterRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketResponseDTO;
 import com.sliit.campus_core.dto.ticket.TicketUpdateStatusRequestDTO;
 import com.sliit.campus_core.ticket.exception.MaxAttachmentsExceededException;
+import com.sliit.campus_core.ticket.model.enums.TicketCategory;
+import com.sliit.campus_core.ticket.model.enums.TicketPriority;
+import com.sliit.campus_core.ticket.model.enums.TicketStatus;
 import com.sliit.campus_core.ticket.service.FileStorageService;
 import com.sliit.campus_core.ticket.service.TicketService;
 import jakarta.validation.Valid;
@@ -153,6 +158,51 @@ public class TicketController {
 
         // TODO: update ticket entity with these URLs (ticketService method)
         return ResponseEntity.ok(ApiResponse.success("Files uploaded successfully", urls));
+    }
+
+    // GET /api/v1/tickets → admin/technician filtered list
+    @GetMapping
+    public ResponseEntity<ApiResponse<?>> getAllTickets(
+            @RequestParam(required = false) TicketStatus status,
+            @RequestParam(required = false) TicketPriority priority,
+            @RequestParam(required = false) TicketCategory category,
+            @RequestParam(required = false) String resourceId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+
+        // TODO: replace stubbed values with JWT claims
+        String userId = "user123";
+        String role = "ADMIN";
+
+        TicketFilterRequestDTO filter = new TicketFilterRequestDTO();
+        filter.setStatus(status);
+        filter.setPriority(priority);
+        filter.setCategory(category);
+        filter.setResourceId(resourceId);
+
+        return ResponseEntity.ok(ApiResponse.success("Tickets fetched successfully",
+                ticketService.getAllTickets(filter, userId, role, pageable)));
+    }
+
+    // GET /api/v1/tickets/analytics → admin analytics
+    @GetMapping("/analytics")
+    public ResponseEntity<ApiResponse<TicketAnalyticsDTO>> getAnalytics() {
+        return ResponseEntity.ok(ApiResponse.success("Analytics fetched successfully",
+                ticketService.getTicketAnalytics()));
+    }
+
+    // GET /api/v1/tickets/resource/{resourceId} → resource-based query
+    @GetMapping("/resource/{resourceId}")
+    public ResponseEntity<ApiResponse<?>> getTicketsByResource(
+            @PathVariable String resourceId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+
+        String userId = "user123"; // TODO: replace with JWT claims
+        String role = "TECHNICIAN"; // TODO: replace with JWT claims
+
+        return ResponseEntity.ok(ApiResponse.success("Tickets by resource fetched successfully",
+                ticketService.getTicketsByResource(resourceId, userId, role, pageable)));
     }
 
 }
