@@ -37,6 +37,7 @@ function Login() {
         try {
             const res = await loginUser(form);
             localStorage.setItem("token", res.data.token);
+            localStorage.setItem("userId", res.data.id);
 
             login(res.data);
 

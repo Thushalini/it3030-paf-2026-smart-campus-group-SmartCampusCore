@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { FaBell } from "react-icons/fa";
 
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
+
 import {
   getNotifications,
   getUnreadCount,
@@ -43,6 +46,40 @@ export default function NotificationBell() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    loadNotifications();
+    loadUnreadCount();
+
+    const token = localStorage.getItem("token"); // ← get JWT token
+
+    const stompClient = new Client({
+      webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+      reconnectDelay: 5000,
+      connectHeaders: {
+        Authorization: `Bearer ${token}`,         // ← add this
+      },
+      onConnect: () => {
+        const userId = localStorage.getItem("userId");
+
+        stompClient.subscribe(
+          `/topic/notifications/${userId}`,
+          (message) => {
+            const newNotification = JSON.parse(message.body);
+            setNotifications((prev) => [newNotification, ...prev]);
+            setUnreadCount((prev) => prev + 1);
+          }
+        );
+      },
+      onStompError: (frame) => {
+        console.error("STOMP error:", frame);      // ← helpful for debugging
+      },
+    });
+
+    stompClient.activate();
+
+    return () => stompClient.deactivate();
+  }, []);
+
   return (
     <div className="relative">
       <div
@@ -61,10 +98,7 @@ export default function NotificationBell() {
         <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-lg z-50">
           <div className="flex justify-between p-2 border-b">
             <h3 className="font-semibold">Notifications</h3>
-            <button
-              onClick={handleMarkAll}
-              className="text-sm text-blue-500"
-            >
+            <button onClick={handleMarkAll} className="text-sm text-blue-500">
               Mark all read
             </button>
           </div>
