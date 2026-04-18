@@ -68,18 +68,18 @@ function StudentResourcesPage() {
   };
 
   const topRatedResource = useMemo(() => {
-    if (!resources.length) return null;
-    return [...resources].sort(
+    if (!filteredResources.length) return null;
+    return [...filteredResources].sort(
       (a, b) => (b.ratingAverage || 0) - (a.ratingAverage || 0)
     )[0];
-  }, [resources]);
+  }, [filteredResources]);
 
   const mostPopularResource = useMemo(() => {
-    if (!resources.length) return null;
-    return [...resources].sort(
+    if (!filteredResources.length) return null;
+    return [...filteredResources].sort(
       (a, b) => (b.bookingCount || 0) - (a.bookingCount || 0)
     )[0];
-  }, [resources]);
+  }, [filteredResources]);
 
   const renderFeatureCard = (title, resource, badgeClass, badgeText) => {
     if (!resource) return null;
@@ -89,7 +89,7 @@ function StudentResourcesPage() {
         <div className={`feature-badge ${badgeClass}`}>{badgeText}</div>
         <img
           src={
-            resource.imageUrl ||
+            resource.imageUrls?.[0] ||
             "https://images.unsplash.com/photo-1497366412874-3415097a27e7"
           }
           alt={resource.name}
@@ -152,7 +152,7 @@ function StudentResourcesPage() {
       {loading && <p className="status-message">Loading resources...</p>}
       {error && <p className="status-message error">{error}</p>}
 
-      {!loading && !error && resources.length > 0 && (
+      {!loading && !error && filteredResources.length > 0 && (
         <div className="featured-section">
           <h2>Featured Resource Insights</h2>
           <div className="featured-grid">
@@ -184,7 +184,7 @@ function StudentResourcesPage() {
             <div className="resource-card" key={resource.id}>
               <img
                 src={
-                  resource.imageUrl ||
+                  resource.imageUrls?.[0] ||
                   "https://images.unsplash.com/photo-1497366412874-3415097a27e7"
                 }
                 alt={resource.name}
