@@ -66,6 +66,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
                 .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/google", "/oauth2/**").permitAll()
                 .requestMatchers("/favicon.ico", "/static/**", "/assets/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/technician/**").hasRole("TECHNICIAN")
                 .anyRequest().authenticated()
