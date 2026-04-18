@@ -20,11 +20,73 @@
   background: #eef2ff;
 }
 
+.details-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .details-image {
   width: 100%;
   height: 100%;
   min-height: 520px;
   object-fit: cover;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(229, 231, 235, 0.9);
+  background: rgba(255, 255, 255, 0.9);
+  color: #111827;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.carousel-nav:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.carousel-prev {
+  left: 14px;
+}
+
+.carousel-next {
+  right: 14px;
+}
+
+.carousel-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: rgba(17, 24, 39, 0.35);
+  cursor: pointer;
+}
+
+.carousel-dot.active {
+  background: rgba(37, 99, 235, 0.95);
+  border-color: rgba(255, 255, 255, 0.95);
 }
 
 .details-content-section {
@@ -172,4 +234,25 @@
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   text-align: center;
+}
+
+.pdf-button {
+  border: none;
+  padding: 12px 18px;
+  background: #2563eb;
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pdf-button:hover {
+  background: #1d4ed8;
+}
+
+.details-actions {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }

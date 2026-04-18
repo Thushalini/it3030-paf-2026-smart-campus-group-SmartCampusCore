@@ -16,7 +16,18 @@ function AdminResourcesPage() {
       setResources(response.data);
     } catch (err) {
       console.error(err);
-      setError("Failed to load resources.");
+      console.log("[AdminResourcesPage] fetchResources failed", {
+        message: err?.message,
+        status: err?.response?.status,
+        data: err?.response?.data,
+      });
+
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        (typeof err?.response?.data === "string" ? err.response.data : null);
+
+      setError(backendMessage || err?.message || "Failed to load resources.");
     } finally {
       setLoading(false);
     }
@@ -44,9 +55,8 @@ function AdminResourcesPage() {
     const active = resources.filter((r) => r.status === "ACTIVE").length;
     const outOfService = resources.filter((r) => r.status === "OUT_OF_SERVICE").length;
     const maintenance = resources.filter((r) => r.status === "UNDER_MAINTENANCE").length;
-    const totalCapacity = resources.reduce((sum, r) => sum + (r.capacity || 0), 0);
 
-    return { total, active, outOfService, maintenance, totalCapacity };
+    return { total, active, outOfService, maintenance };
   }, [resources]);
 
   return (
@@ -89,11 +99,6 @@ function AdminResourcesPage() {
             <h4>Maintenance</h4>
             <p>{stats.maintenance}</p>
           </div>
-
-          <div className="summary-card">
-            <h4>Total Capacity</h4>
-            <p>{stats.totalCapacity}</p>
-          </div>
         </div>
       )}
 
@@ -126,7 +131,7 @@ function AdminResourcesPage() {
                   <td>
                     <img
                       src={
-                        resource.imageUrl ||
+                        resource.imageUrls?.[0] ||
                         "https://images.unsplash.com/photo-1497366412874-3415097a27e7"
                       }
                       alt={resource.name}
