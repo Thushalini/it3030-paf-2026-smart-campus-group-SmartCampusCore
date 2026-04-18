@@ -24,6 +24,7 @@ const Sidebar = () => {
         {/* 👤 USER */}
         {role === "USER" && (
           <>
+            <li><Link to="/user" style={{ color: "white" }}>My Profile</Link></li>
             <li><Link to="/bookings" style={{ color: "white" }}>My Bookings</Link></li>
             <li><Link to="/tickets" style={{ color: "white" }}>My Tickets</Link></li>
           </>

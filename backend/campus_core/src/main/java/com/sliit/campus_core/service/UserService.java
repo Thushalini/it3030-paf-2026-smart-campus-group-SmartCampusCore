@@ -1,21 +1,30 @@
 package com.sliit.campus_core.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sliit.campus_core.entity.Role;
 import com.sliit.campus_core.entity.Status;
 import com.sliit.campus_core.entity.User;
 import com.sliit.campus_core.entity.UserType;
 import com.sliit.campus_core.repository.UserRepository;
+import com.sliit.campus_core.security.JwtUtil;
+
 
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository repository;
+    @Autowired 
+    private JwtUtil jwtUtil;
 
     public User getByEmail(String email) {
         return repository.findByEmail(email)
@@ -122,5 +131,67 @@ public class UserService {
         user.setStatus(Status.ACTIVE);
 
         return repository.save(user);
+    }
+
+    // ✅ Get logged user from JWT
+    public User getLoggedUser(String token) {
+        String email = jwtUtil.extractEmail(token.substring(7));
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    // ✅ Get My Profile
+    public User getMyProfile(String token) {
+        return getLoggedUser(token);
+    }
+
+    // ✅ Update Profile (ONLY OWN DATA)
+    public User updateProfile(String token, User updated) {
+
+        User user = getLoggedUser(token);
+
+        user.setName(updated.getName());
+        user.setPhone(updated.getPhone());
+        user.setDepartment(updated.getDepartment());
+
+        // optional
+        user.setBookingNotifications(updated.isBookingNotifications());
+        user.setTicketNotifications(updated.isTicketNotifications());
+        user.setCommentNotifications(updated.isCommentNotifications());
+
+        return repository.save(user);
+    }
+
+    // ✅ Disable account (soft delete)
+    public void disableAccount(String token) {
+
+        User user = getLoggedUser(token);
+
+        user.setStatus(Status.DISABLED);
+
+        repository.save(user);
+    }
+
+    // ✅ Upload profile picture
+    public String uploadProfilePic(String token, MultipartFile file) {
+
+        User user = getLoggedUser(token);
+
+        try {
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+
+            Path path = Paths.get("uploads/" + fileName);
+            Files.createDirectories(path.getParent());
+            Files.write(path, file.getBytes());
+
+            user.setProfileImage("/uploads/" + fileName);
+
+            repository.save(user);
+
+            return "Uploaded successfully: " + fileName;
+
+        } catch (IOException e) {
+            throw new RuntimeException("File upload failed");
+        }
     }
 }

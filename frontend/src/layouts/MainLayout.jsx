@@ -15,7 +15,7 @@ const MainLayout = () => {
         <Navbar />
 
         <div style={{ padding: "20px", flex: 1 }}>
-          <Outlet /> {/* 🔥 THIS FIXES EVERYTHING */}
+          <Outlet /> 
         </div>
 
       </div>

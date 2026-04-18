@@ -6,11 +6,9 @@ import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Signup from "../pages/Signup";
 
-import UserPage from "../pages/UserPage";
-import TechnicianPage from "../pages/TechnicianPage";
-import AdminPage from "../pages/AdminPage";
 import AdminManageUsers from "../pages/AdminManageUsers";
 import AdminDisabledUsers from "../pages/AdminDisabledUsers";
+import Profile from "../pages/Profile";
 
 const AppRoutes = () => {
   return (
@@ -33,23 +31,23 @@ const AppRoutes = () => {
           path="/user"
           element={
             <PrivateRoute allowedRoles={["USER"]}>
-              <MainLayout>
-                <UserPage />
-              </MainLayout>
+              <MainLayout />
             </PrivateRoute>
           }
-        />
+        >
+          <Route index element={<Profile />} />
+        </Route>
 
         <Route
           path="/technician"
           element={
             <PrivateRoute allowedRoles={["TECHNICIAN"]}>
-              <MainLayout>
-                <TechnicianPage />
-              </MainLayout>
+              <MainLayout />
             </PrivateRoute>
           }
-        />
+        >
+          <Route index element={<Profile />} />
+        </Route>
 
         {/* ADMIN ONLY */}
         <Route
@@ -60,7 +58,7 @@ const AppRoutes = () => {
             </PrivateRoute>
           }
         >
-          <Route index element={<AdminPage />} />
+          <Route index element={<Profile />} />
           <Route path="manage-users" element={<AdminManageUsers />} />
           <Route path="disabled-users" element={<AdminDisabledUsers />} />
         </Route>
