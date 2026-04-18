@@ -1,5 +1,6 @@
 package com.sliit.campus_core.ticket.service.impl;
 
+import com.sliit.campus_core.dto.NotificationRequestDTO;
 import com.sliit.campus_core.dto.comment.CommentCreateRequestDTO;
 import com.sliit.campus_core.dto.comment.CommentUpdateRequestDTO;
 import com.sliit.campus_core.dto.comment.CommentResponseDTO;
@@ -10,6 +11,7 @@ import com.sliit.campus_core.ticket.model.TicketComment;
 import com.sliit.campus_core.ticket.repository.TicketCommentRepository;
 import com.sliit.campus_core.ticket.repository.TicketRepository;
 import com.sliit.campus_core.ticket.service.TicketCommentService;
+import com.sliit.campus_core.ticket.service.NotificationPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,9 @@ public class TicketCommentServiceImpl implements TicketCommentService {
         this.commentRepository = commentRepository;
     }
 
+    @Autowired
+    private NotificationPublisher notificationPublisher;
+
     @Override
     public CommentResponseDTO addComment(String ticketId, CommentCreateRequestDTO dto,
                                          String authorId, String authorName, String authorRole) {
@@ -47,6 +52,18 @@ public class TicketCommentServiceImpl implements TicketCommentService {
         comment.setDeleted(false);
 
         TicketComment saved = commentRepository.save(comment);
+
+        NotificationRequestDTO req = new NotificationRequestDTO();
+        req.setRecipientUserId(ticket.getReportedById());
+        req.setType("COMMENT_ADDED");
+        req.setTitle("New Comment");
+        req.setMessage(comment.getContent());
+        req.setReferenceId(comment.getId());
+        req.setReferenceType("COMMENT");
+        notificationPublisher.publishCommentAdded(req);
+
+        // TODO: replace with publishCommentAdded when Member 4 defines NotificationService
+
         return toResponse(saved, authorId, authorRole);
     }
 
@@ -75,6 +92,18 @@ public class TicketCommentServiceImpl implements TicketCommentService {
         comment.setUpdatedAt(Instant.now());
 
         TicketComment updated = commentRepository.save(comment);
+
+        NotificationRequestDTO req = new NotificationRequestDTO();
+        req.setRecipientUserId(comment.getAuthorId());
+        req.setType("COMMENT_UPDATED");
+        req.setTitle("Comment Updated");
+        req.setMessage(comment.getContent());
+        req.setReferenceId(comment.getId());
+        req.setReferenceType("COMMENT");
+        notificationPublisher.publishCommentUpdated(req);
+
+        // TODO: publishCommentUpdated when Member 4 defines NotificationService
+
         return toResponse(updated, currentUserId, null);
     }
 
@@ -92,6 +121,18 @@ public class TicketCommentServiceImpl implements TicketCommentService {
         comment.setContent("[deleted]");
         comment.setUpdatedAt(Instant.now());
         commentRepository.save(comment);
+
+        NotificationRequestDTO req = new NotificationRequestDTO();
+        req.setRecipientUserId(comment.getAuthorId());
+        req.setType("COMMENT_DELETED");
+        req.setTitle("Comment Deleted");
+        req.setMessage("[deleted]");
+        req.setReferenceId(comment.getId());
+        req.setReferenceType("COMMENT");
+        notificationPublisher.publishCommentDeleted(req);
+
+        // TODO: publishCommentDeleted when Member 4 defines NotificationService
+
     }
 
     private CommentResponseDTO toResponse(TicketComment comment, String currentUserId, String currentRole) {

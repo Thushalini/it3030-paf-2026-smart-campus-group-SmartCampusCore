@@ -1,5 +1,6 @@
 package com.sliit.campus_core.ticket.service.impl;
 
+import com.sliit.campus_core.dto.NotificationRequestDTO;
 import com.sliit.campus_core.dto.ticket.ContactDetailsDTO;
 import com.sliit.campus_core.dto.ticket.TicketAnalyticsDTO;
 import com.sliit.campus_core.dto.ticket.TicketAssignRequestDTO;
@@ -41,7 +42,7 @@ public class TicketServiceImpl implements TicketService {
     private final AtomicInteger sequence = new AtomicInteger(1);
 
     @Autowired
-private TicketStatusHistoryRepository ticketStatusHistoryRepository;
+    private TicketStatusHistoryRepository ticketStatusHistoryRepository;
 
     @Autowired
     private NotificationPublisher notificationPublisher;
@@ -82,6 +83,16 @@ private TicketStatusHistoryRepository ticketStatusHistoryRepository;
         ticket.setUpdatedAt(Instant.now());
 
         Ticket saved = ticketRepository.save(ticket);
+
+        NotificationRequestDTO req = new NotificationRequestDTO();
+        req.setRecipientUserId(reportedById);
+        req.setType("TICKET_CREATED");
+        req.setTitle("New Ticket Created");
+        req.setMessage(ticket.getTitle());
+        req.setReferenceId(ticket.getId());
+        req.setReferenceType("TICKET");
+        notificationPublisher.publishTicketCreated(req);
+
         return ticketMapper.toResponseDTO(saved);
     }
 
@@ -164,7 +175,14 @@ private TicketStatusHistoryRepository ticketStatusHistoryRepository;
 
         ticketStatusHistoryRepository.save(history);
 
-        notificationPublisher.publishStatusChanged(savedTicket, savedTicket.getStatus());
+        NotificationRequestDTO req = new NotificationRequestDTO();
+        req.setRecipientUserId(ticket.getReportedById());
+        req.setType("TICKET_STATUS_CHANGED");
+        req.setTitle("Status Updated");
+        req.setMessage("Ticket status changed to " + ticket.getStatus());
+        req.setReferenceId(ticket.getId());
+        req.setReferenceType("TICKET");
+        notificationPublisher.publishStatusChanged(req);
 
         return ticketMapper.toResponseDTO(savedTicket);
     }
@@ -182,7 +200,14 @@ private TicketStatusHistoryRepository ticketStatusHistoryRepository;
         ticket.setAssignedToName(dto.getTechnicianName());
         ticketRepository.save(ticket);
 
-        notificationPublisher.publishTechnicianAssigned(ticket);
+        NotificationRequestDTO req = new NotificationRequestDTO();
+        req.setRecipientUserId(dto.getTechnicianId());
+        req.setType("TICKET_ASSIGNED");
+        req.setTitle("Technician Assigned");
+        req.setMessage("Assigned to " + dto.getTechnicianName());
+        req.setReferenceId(ticket.getId());
+        req.setReferenceType("TICKET");
+        notificationPublisher.publishTechnicianAssigned(req);
 
         return ticketMapper.toResponseDTO(ticket);
     }
