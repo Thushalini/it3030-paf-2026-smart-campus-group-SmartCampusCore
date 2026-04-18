@@ -113,4 +113,14 @@ public class UserService {
         user.setStatus(Status.DISABLED);
         repository.save(user);
     }
+
+    public User enableUser(String id) {
+
+        User user = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setStatus(Status.ACTIVE);
+
+        return repository.save(user);
+    }
 }

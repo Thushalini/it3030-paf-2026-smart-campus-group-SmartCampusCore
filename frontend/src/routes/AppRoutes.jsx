@@ -10,7 +10,7 @@ import UserPage from "../pages/UserPage";
 import TechnicianPage from "../pages/TechnicianPage";
 import AdminPage from "../pages/AdminPage";
 import AdminManageUsers from "../pages/AdminManageUsers";
-
+import AdminDisabledUsers from "../pages/AdminDisabledUsers";
 
 const AppRoutes = () => {
   return (
@@ -62,6 +62,7 @@ const AppRoutes = () => {
         >
           <Route index element={<AdminPage />} />
           <Route path="manage-users" element={<AdminManageUsers />} />
+          <Route path="disabled-users" element={<AdminDisabledUsers />} />
         </Route>
       </Routes>
     </BrowserRouter>

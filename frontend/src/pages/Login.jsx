@@ -42,9 +42,10 @@ function Login() {
 
             const role = res.data.role;
 
-            if (role === "ADMIN") navigate("/admin", { replace: true });
-            else if (role === "TECHNICIAN") navigate("/technician", { replace: true });
-            else navigate("/dashboard", { replace: true });
+            // if (role === "ADMIN") navigate("/admin", { replace: true });
+            // else if (role === "TECHNICIAN") navigate("/technician", { replace: true });
+            // else 
+            navigate("/dashboard", { replace: true });
 
         } catch (err) {
             console.error(err);
