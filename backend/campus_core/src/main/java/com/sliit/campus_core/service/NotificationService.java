@@ -13,15 +13,14 @@ import com.sliit.campus_core.repository.NotificationRepository;
 @Service
 public class NotificationService {
 
-    @Autowired private NotificationRepository repository;
+    @Autowired
+    private NotificationRepository repository;
 
-    // type = "BOOKING", "TICKET", or "COMMENT"
     public void sendNotification(User user, String message, String type) {
 
-        // Check user preferences before saving
         boolean allowed = switch (type) {
             case "BOOKING" -> user.isBookingNotifications();
-            case "TICKET"  -> user.isTicketNotifications();
+            case "TICKET" -> user.isTicketNotifications();
             case "COMMENT" -> user.isCommentNotifications();
             default -> true;
         };
@@ -34,16 +33,29 @@ public class NotificationService {
         n.setType(type);
         n.setCreatedAt(LocalDateTime.now());
         n.setRead(false);
+
         repository.save(n);
     }
 
     public List<Notification> getUserNotifications(User user) {
-        return repository.findByUserId(user.getId());
+        return repository.findByUserIdOrderByCreatedAtDesc(user.getId());
+    }
+
+    public long getUnreadCount(User user) {
+        return repository.countByUserIdAndIsReadFalse(user.getId());
     }
 
     public void markAsRead(String id) {
         Notification n = repository.findById(id).orElseThrow();
         n.setRead(true);
         repository.save(n);
+    }
+
+    public void markAllAsRead(User user) {
+        List<Notification> list = repository.findByUserIdOrderByCreatedAtDesc(user.getId());
+        for (Notification n : list) {
+            n.setRead(true);
+        }
+        repository.saveAll(list);
     }
 }

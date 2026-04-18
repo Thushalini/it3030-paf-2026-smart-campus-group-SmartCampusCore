@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import NotificationBell from "./NotificationBell";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -13,6 +14,7 @@ const Navbar = () => {
       justifyContent: "space-between"
     }}>
       <h3>Dashboard</h3>
+      <NotificationBell />
 
       <div>
         <span>{user?.email}</span>
