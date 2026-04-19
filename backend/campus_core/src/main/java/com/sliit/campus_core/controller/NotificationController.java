@@ -57,22 +57,22 @@ public class NotificationController {
         notificationService.markAllAsRead(user);
     }
 
+    //test endpoint to send a notification to self
     @PostMapping("/test")
     public ResponseEntity<?> sendTestNotification(Authentication auth) {
-        String userId = auth.getName(); // this is the email from JWT
+        String email = auth.getName();
+        User user = userService.getByEmail(email); // ← get the full user object
 
-        // 1. Save to DB
         Notification n = new Notification();
         n.setMessage("🔔 Test notification at " + LocalDateTime.now());
         n.setType("TEST");
-        n.setRead(false);
+        n.setisRead(false);
         n.setCreatedAt(LocalDateTime.now());
-        n.setUserId(userId);
+        n.setUserId(user.getId()); // ← use user.getId(), not email
         notificationService.save(n);
 
-        // 2. Push via WebSocket
-        messagingTemplate.convertAndSend("/topic/notifications/" + userId, n);
+        messagingTemplate.convertAndSend("/topic/notifications/" + user.getId(), n);
 
-        return ResponseEntity.ok("Test notification sent to " + userId);
+        return ResponseEntity.ok("Test notification sent to " + email);
     }
 }

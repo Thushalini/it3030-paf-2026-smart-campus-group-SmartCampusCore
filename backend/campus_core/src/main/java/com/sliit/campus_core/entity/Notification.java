@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Document(collection = "notifications")
 public class Notification {
 
@@ -13,6 +15,8 @@ public class Notification {
 
     private String message;
     private String type;   // "BOOKING", "TICKET", "COMMENT"
+
+    @JsonProperty("isRead") 
     private boolean isRead;
     private LocalDateTime createdAt;
 
@@ -27,8 +31,9 @@ public class Notification {
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
 
+    @JsonProperty("isRead") 
     public boolean isRead() { return isRead; }
-    public void setRead(boolean read) { isRead = read; }
+    public void setisRead(boolean read) { isRead = read; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
