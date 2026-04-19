@@ -2,8 +2,10 @@ package com.sliit.campus_core.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "resources")
@@ -24,7 +26,10 @@ public class Resource {
     private String availabilityWindow;
     private ResourceStatus status;
     private List<String> features;
-    private String imageUrl;
+    private List<String> imageUrls;
+
+    @Field("imageUrl")
+    private String legacyImageUrl;
 
     private Double ratingAverage;
     private Integer ratingCount;
@@ -140,12 +145,18 @@ public class Resource {
         this.features = features;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public List<String> getImageUrls() {
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            return imageUrls;
+        }
+        if (legacyImageUrl != null && !legacyImageUrl.isBlank()) {
+            return List.of(legacyImageUrl.trim());
+        }
+        return new ArrayList<>();
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public Double getRatingAverage() {
@@ -187,4 +198,9 @@ public class Resource {
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    
+
+    
 }
+
