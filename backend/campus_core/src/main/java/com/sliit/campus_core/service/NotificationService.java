@@ -35,7 +35,7 @@ public class NotificationService {
         n.setMessage(message);
         n.setType(type);
         n.setCreatedAt(LocalDateTime.now());
-        n.setRead(false);
+        n.setisRead(false);
 
         repository.save(n);
 
@@ -76,14 +76,14 @@ public class NotificationService {
 
     public void markAsRead(String id) {
         Notification n = repository.findById(id).orElseThrow();
-        n.setRead(true);
+        n.setisRead(true);
         repository.save(n);
     }
 
     public void markAllAsRead(User user) {
         List<Notification> list = repository.findByUserIdOrderByCreatedAtDesc(user.getId());
         for (Notification n : list) {
-            n.setRead(true);
+            n.setisRead(true);
         }
         repository.saveAll(list);
     }
