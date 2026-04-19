@@ -6,9 +6,10 @@ import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Signup from "../pages/Signup";
 
+import Profile from "../pages/Profile";
 import AdminManageUsers from "../pages/AdminManageUsers";
 import AdminDisabledUsers from "../pages/AdminDisabledUsers";
-import Profile from "../pages/Profile";
+import AdminNotificationsPanel from "../pages/AdminNotificationsPanel";
 
 const AppRoutes = () => {
   return (
@@ -61,6 +62,7 @@ const AppRoutes = () => {
           <Route index element={<Profile />} />
           <Route path="manage-users" element={<AdminManageUsers />} />
           <Route path="disabled-users" element={<AdminDisabledUsers />} />
+          <Route path="notifications" element={<AdminNotificationsPanel />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -33,7 +33,7 @@ const Sidebar = () => {
         {/* 🛠 TECHNICIAN */}
         {role === "TECHNICIAN" && (
           <>
-            <li><Link to="/technician" style={{ color: "white" }}>Assigned Tickets</Link></li>
+            <li><Link to="/technician" style={{ color: "white" }}>Profile</Link></li>
           </>
         )}
 
@@ -45,7 +45,7 @@ const Sidebar = () => {
                 to="/admin" 
                 className="block px-3 py-2 rounded hover:bg-blue-700"
               >
-                Admin Panel
+                Admin Profile
               </Link>
             </li>
 
@@ -57,6 +57,16 @@ const Sidebar = () => {
                 Manage Users
               </Link>
             </li>
+
+            <li>
+              <Link 
+                to="/admin/notifications" 
+                className="block px-3 py-2 rounded hover:bg-blue-700"
+              >
+                Notifications
+              </Link>
+            </li>
+
           </>
         )}
 
