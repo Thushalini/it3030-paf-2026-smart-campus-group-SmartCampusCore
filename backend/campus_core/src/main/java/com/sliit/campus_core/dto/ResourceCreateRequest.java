@@ -19,7 +19,7 @@ public class ResourceCreateRequest {
     private String availabilityWindow;
     private ResourceStatus status;
     private List<String> features;
-    private String imageUrl;
+    private List<String> imageUrls;
 
     private Double ratingAverage;
     private Integer ratingCount;
@@ -76,8 +76,8 @@ public class ResourceCreateRequest {
         return features;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public List<String> getImageUrls() {
+        return imageUrls;
     }
 
     public Double getRatingAverage() {
@@ -140,8 +140,8 @@ public class ResourceCreateRequest {
         this.features = features;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public void setRatingAverage(Double ratingAverage) {
