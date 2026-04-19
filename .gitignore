@@ -19,6 +19,8 @@
 # Spring Boot build
 /backend/campus_core/target/
 
+/backend/campus_core/src/main/resources/application-secrets.properties
+
 # Frontend environment
 /frontend/.env
 
