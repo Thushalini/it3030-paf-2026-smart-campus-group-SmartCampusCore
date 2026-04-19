@@ -3,8 +3,10 @@ package com.sliit.campus_core.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,8 +16,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sliit.campus_core.entity.Notification;
 import com.sliit.campus_core.entity.NotificationLog;
 import com.sliit.campus_core.entity.Role;
 import com.sliit.campus_core.entity.User;
@@ -114,5 +118,19 @@ public class AdminNotificationController {
         log.setSentAt(LocalDateTime.now());
         log.setRecipientCount(count);
         logRepository.save(log);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Notification>> getAllNotifications(
+            @RequestParam(required = false) String type) {
+        List<Notification> all = notificationRepository.findAll(
+            Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+        if (type != null && !type.isBlank()) {
+            all = all.stream()
+                    .filter(n -> type.equalsIgnoreCase(n.getType()))
+                    .collect(Collectors.toList());
+        }
+        return ResponseEntity.ok(all);
     }
 }

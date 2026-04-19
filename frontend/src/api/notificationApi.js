@@ -62,3 +62,14 @@ export const deleteNotificationLog = (logId) => {
     getAuthHeader()
   );
 };
+
+const ADMIN_URL = "http://localhost:8080/api/admin/notifications";
+
+export const getAllNotificationsAdmin = (type = "") => {
+  const params = type ? `?type=${type}` : "";
+  return axios.get(`${ADMIN_URL}/all${params}`, getAuthHeader());
+};
+
+export const deleteNotificationById = (id) => {
+  return axios.delete(`${ADMIN_URL}/${id}`, getAuthHeader());
+};
