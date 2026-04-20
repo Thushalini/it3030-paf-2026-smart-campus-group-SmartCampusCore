@@ -1,0 +1,332 @@
+{
+	"info": {
+		"_postman_id": "smart-campus-operations",
+		"name": "Smart Campus Operations Hub API",
+		"description": "API collection for testing the Smart Campus Operations Hub booking management system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login (User)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login?email=user@campus.com&name=John Doe&role=USER",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"],
+							"query": [
+								{
+									"key": "email",
+									"value": "user@campus.com"
+								},
+								{
+									"key": "name",
+									"value": "John Doe"
+								},
+								{
+									"key": "role",
+									"value": "USER"
+								}
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"pm.collectionVariables.set('userToken', response.token);",
+									"pm.collectionVariables.set('userEmail', response.email);",
+									"pm.collectionVariables.set('userName', response.name);",
+									"pm.collectionVariables.set('userRole', response.role);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Login (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login?email=admin@campus.com&name=Admin User&role=ADMIN",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"],
+							"query": [
+								{
+									"key": "email",
+									"value": "admin@campus.com"
+								},
+								{
+									"key": "name",
+									"value": "Admin User"
+								},
+								{
+									"key": "role",
+									"value": "ADMIN"
+								}
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"pm.collectionVariables.set('adminToken', response.token);",
+									"pm.collectionVariables.set('adminEmail', response.email);",
+									"pm.collectionVariables.set('adminName', response.name);",
+									"pm.collectionVariables.set('adminRole', response.role);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "me"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Resources",
+			"item": [
+				{
+					"name": "Get Active Resources",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resources",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "resources"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Bookings (User)",
+			"item": [
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"resourceId\": 1,\n    \"date\": \"2024-12-25\",\n    \"startTime\": \"10:00\",\n    \"endTime\": \"11:00\",\n    \"purpose\": \"Team meeting for project discussion\",\n    \"attendeesCount\": 5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"if (pm.response.code === 201) {",
+									"    pm.collectionVariables.set('bookingId', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get My Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/my",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "my"]
+						}
+					}
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/{{bookingId}}/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "{{bookingId}}", "cancel"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Bookings (Admin)",
+			"item": [
+				{
+					"name": "Get All Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings?status=PENDING",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings"],
+							"query": [
+								{
+									"key": "status",
+									"value": "PENDING"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Approve Booking",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/{{bookingId}}/approve",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "{{bookingId}}", "approve"]
+						}
+					}
+				},
+				{
+					"name": "Reject Booking",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Resource already booked for this time slot\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/{{bookingId}}/reject",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings", "{{bookingId}}", "reject"]
+						}
+					}
+				},
+				{
+					"name": "Get Bookings with Filters",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings?date=2024-12-25&resourceId=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bookings"],
+							"query": [
+								{
+									"key": "date",
+									"value": "2024-12-25"
+								},
+								{
+									"key": "resourceId",
+									"value": "1"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		}
+	]
+}
