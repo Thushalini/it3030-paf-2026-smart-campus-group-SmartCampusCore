@@ -8,12 +8,12 @@ import lombok.*;
 @AllArgsConstructor
 public class ContactDetails {
     private String contactName;
+    private String email; 
     private String phone;
     private PreferredMethod preferredMethod;
 
     public enum PreferredMethod {
         EMAIL,
-        PHONE,
-        IN_PERSON
+        PHONE
     }  
 }

@@ -156,8 +156,9 @@ public class TicketController {
             fileParts.forEach(part -> urls.add(fileStorageService.storeFile(part)));
         }
 
-        // TODO: update ticket entity with these URLs (ticketService method)
-        return ResponseEntity.ok(ApiResponse.success("Files uploaded successfully", urls));
+        TicketResponseDTO updated = ticketService.addImageAttachments(id, urls);
+        return ResponseEntity.ok(ApiResponse.success("Files uploaded successfully", updated));
+
     }
 
     // GET /api/v1/tickets → admin/technician filtered list

@@ -1,0 +1,190 @@
+/* ── Smart Campus Design Tokens ── */
+:root {
+  --primary: #0ea5e9;           /* Sky 500 - Smart/Tech */
+  --primary-hover: #0284c7;     /* Sky 600 */
+  --primary-light: #e0f2fe;     /* Sky 100 */
+  --accent: #10b981;            /* Emerald 500 - Operations/Success */
+  --bg: #f8fafc;                /* Slate 50 */
+  --surface: #ffffff;
+  --text: #1e293b;              /* Slate 800 */
+  --text-secondary: #64748b;    /* Slate 500 */
+  --border: #cbd5e1;            /* Slate 300 */
+  --border-focus: var(--primary);
+  --radius: 0.5rem;
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* ── Form Container ── */
+form {
+  max-width: 720px;
+  margin: 2.5rem auto;
+  padding: 2rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  color: var(--text);
+  animation: slideUp 0.4s ease-out;
+}
+
+/* ── Base Inputs ── */
+form input,
+form select,
+form textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+  background-color: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+form input::placeholder,
+form textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.9;
+}
+
+/* ── Focus States ── */
+form input:focus,
+form select:focus,
+form textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* ── Select Dropdown ── */
+form select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+/* Placeholder color for unselected required selects */
+form select:invalid {
+  color: var(--text-secondary);
+}
+
+form select option {
+  color: var(--text);
+  background: var(--surface);
+}
+
+/* ── Textarea ── */
+form textarea {
+  min-height: 120px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* ── Auto-filled Location (Read-Only) ── */
+form input[name="location"] {
+  background-color: #f1f5f9; /* Slate 100 */
+  border-style: dashed;
+  border-color: #94a3b8;
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  font-style: italic;
+}
+
+/* ── Contact Details Grouping ── */
+/* Adds a subtle visual separator before the contact section starts */
+form input[name="contactName"] {
+  margin-top: 0.5rem;
+  border-top: 3px solid var(--primary-light);
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+/* ── Image Uploader Zone ── */
+/* Targets the ImageUploader wrapper div. If your ImageUploader renders
+   something other than a <div>, wrap it in: <div className="upload-zone"> */
+form > div {
+  padding: 1.5rem 1rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background-color: var(--bg);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: border-color 0.2s, background-color 0.2s;
+  cursor: pointer;
+}
+
+form > div:hover {
+  border-color: var(--primary);
+  background-color: var(--primary-light);
+}
+
+/* ── Submit Button ── */
+form button[type="submit"] {
+  margin-top: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: white;
+  background: linear-gradient(135deg, var(--primary), #38bdf8);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+form button[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--primary-hover), #0ea5e9);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+form button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+form button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+/* ── Animations ── */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Responsive ── */
+@media (min-width: 640px) {
+  form {
+    padding: 2.5rem;
+  }
+
+  form button[type="submit"] {
+    width: auto;
+    align-self: flex-end;
+    min-width: 180px;
+  }
+}

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ContactDetailsDTO {
     private String contactName;
+    private String email;
     private String phone;
     private ContactDetails.PreferredMethod preferredMethod;
 
@@ -19,6 +20,7 @@ public class ContactDetailsDTO {
     public ContactDetails toEntity() {
         ContactDetails entity = new ContactDetails();
         entity.setContactName(this.contactName);
+        entity.setEmail(this.email);
         entity.setPhone(this.phone);
         entity.setPreferredMethod(this.preferredMethod);
         return entity;
@@ -29,6 +31,7 @@ public class ContactDetailsDTO {
         if (entity == null) return null;
         ContactDetailsDTO dto = new ContactDetailsDTO();
         dto.setContactName(entity.getContactName());
+        dto.setEmail(entity.getEmail());
         dto.setPhone(entity.getPhone());
         dto.setPreferredMethod(entity.getPreferredMethod());
         return dto;

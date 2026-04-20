@@ -6,6 +6,9 @@ import com.sliit.campus_core.dto.ticket.TicketResponseDTO;
 import com.sliit.campus_core.dto.ticket.TicketUpdateStatusRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketAnalyticsDTO;
 import com.sliit.campus_core.dto.ticket.TicketAssignRequestDTO;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,6 +18,8 @@ public interface TicketService {
                                    String reportedByName,
                                    String reportedByEmail);
 
+    TicketResponseDTO addImageAttachments(String ticketId, List<String> urls);
+    
     TicketResponseDTO getTicketById(String ticketId,
                                     String currentUserId,
                                     String currentRole);
