@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useState , useContext} from "react";
 import { signupUser } from "../api/authService";
 import { useNavigate } from "react-router-dom";
+
+import { AuthContext } from "../context/AuthContext";  
+import axios from "axios"; 
 
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
 function Signup() {
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const [form, setForm] = useState({
         name: "",
@@ -52,18 +56,21 @@ function Signup() {
     // -------------------------
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
-            const decoded = jwtDecode(credentialResponse.credential);
+            const res = await axios.post(
+                "http://localhost:8080/api/auth/google",
+                { token: credentialResponse.credential }  // ← send to backend
+            );
 
-            console.log("Google user:", decoded);
+            console.log("Google signup response:", res.data);
 
-            // 👉 SEND TO BACKEND (RECOMMENDED)
-            // await googleAuthAPI(credentialResponse.credential);
+            localStorage.setItem("token", res.data.token);
+            login(res.data);  // ← make sure you import useContext + AuthContext like Login.jsx
 
-            alert("Google login successful!");
+            alert("Google signup successful!");
+            navigate("/dashboard", { replace: true });
 
-            navigate("/dashboard");
         } catch (err) {
-            console.error(err);
+            console.error("Google signup error:", err);
             setError("Google signup failed");
         }
     };
