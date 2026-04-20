@@ -9,16 +9,13 @@ export default function Profile() {
   const token = localStorage.getItem("token");
   const API = "http://localhost:8080/api/profile";
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  useEffect(() => { fetchProfile(); }, []);
 
   const fetchProfile = async () => {
     try {
       const res = await axios.get(`${API}/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       setUser(res.data);
     } finally {
       setLoading(false);
@@ -27,6 +24,16 @@ export default function Profile() {
 
   const handleSave = async () => {
     if (!window.confirm("Do you want to save changes?")) return;
+
+    // Validate ID fields before saving
+    if (user.userType === "STUDENT" && !user.studentId?.trim()) {
+      alert("Student ID is required");
+      return;
+    }
+    if (user.userType === "STAFF" && !user.staffId?.trim()) {
+      alert("Staff ID is required");
+      return;
+    }
 
     await axios.put(`${API}/update`, user, {
       headers: { Authorization: `Bearer ${token}` },
@@ -39,29 +46,31 @@ export default function Profile() {
 
   const handleDisable = async () => {
     if (!window.confirm("Disable your account? This action is permanent.")) return;
-
     await axios.delete(`${API}/disable`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
     alert("Account disabled");
   };
 
   const handleUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const formData = new FormData();
     formData.append("file", file);
-
     await axios.post(`${API}/upload-pic`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
     });
-
     fetchProfile();
+  };
+
+  // When userType changes, clear the irrelevant ID field
+  const handleUserTypeChange = (newType) => {
+    setUser({
+      ...user,
+      userType: newType,
+      studentId: newType === "STUDENT" ? user.studentId : null,
+      staffId: newType === "STAFF" ? user.staffId : null,
+    });
   };
 
   if (loading) return <p style={styles.center}>Loading...</p>;
@@ -75,29 +84,23 @@ export default function Profile() {
         <img
           src={
             user.profileImage?.trim()
-              ? user.profileImage
+              ? `http://localhost:8080${user.profileImage}`
               : `https://ui-avatars.com/api/?name=${user.name}`
           }
           alt="profile"
           style={styles.avatar}
         />
-
-        {editMode && (
-          <input type="file" onChange={handleUpload} style={styles.file} />
-        )}
+        {editMode && <input type="file" onChange={handleUpload} style={styles.file} />}
 
         {/* NAME */}
         {editMode ? (
-          <input
-            style={styles.input}
-            value={user.name || ""}
-            onChange={(e) => setUser({ ...user, name: e.target.value })}
-          />
+          <input style={styles.input} value={user.name || ""}
+            onChange={(e) => setUser({ ...user, name: e.target.value })} />
         ) : (
           <h2>{user.name}</h2>
         )}
 
-        {/* ROLE */}
+        {/* ROLE badge (not editable — set by admin) */}
         <span style={styles.badge}>{user.role}</span>
 
         {/* EMAIL */}
@@ -105,78 +108,78 @@ export default function Profile() {
 
         {/* PHONE */}
         {editMode ? (
-          <input
-            style={styles.input}
-            value={user.phone || ""}
+          <input style={styles.input} value={user.phone || ""}
             onChange={(e) => setUser({ ...user, phone: e.target.value })}
-            placeholder="Phone"
-          />
+            placeholder="Phone" />
         ) : (
-          <p>{user.phone}</p>
+          <p>{user.phone || "—"}</p>
         )}
 
         {/* DEPARTMENT */}
         {editMode ? (
-          <input
-            style={styles.input}
-            value={user.department || ""}
+          <input style={styles.input} value={user.department || ""}
             onChange={(e) => setUser({ ...user, department: e.target.value })}
-            placeholder="Department"
-          />
+            placeholder="Department" />
         ) : (
-          <p>{user.department}</p>
+          <p>{user.department || "—"}</p>
         )}
 
-        {/* STUDENT / STAFF FIELDS */}
-        {user.role === "STUDENT" && (
-          editMode ? (
-            <input
-              style={styles.input}
-              value={user.studentId || ""}
-              onChange={(e) => setUser({ ...user, studentId: e.target.value })}
-              placeholder="Student ID"
-            />
+        {/* ✅ USER TYPE */}
+        <div style={styles.fieldGroup}>
+          <label style={styles.label}>User Type</label>
+          {editMode ? (
+            <select style={styles.select} value={user.userType || ""}
+              onChange={(e) => handleUserTypeChange(e.target.value)}>
+              <option value="">— Select —</option>
+              <option value="STUDENT">Student</option>
+              <option value="STAFF">Staff</option>
+            </select>
           ) : (
-            <p>Student ID: {user.studentId}</p>
-          )
+            <p style={styles.value}>{user.userType || "Not set"}</p>
+          )}
+        </div>
+
+        {/* ✅ STUDENT ID — shown when userType is STUDENT */}
+        {(user.userType === "STUDENT") && (
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Student ID</label>
+            {editMode ? (
+              <input style={styles.input} value={user.studentId || ""}
+                onChange={(e) => setUser({ ...user, studentId: e.target.value })}
+                placeholder="Student ID" />
+            ) : (
+              <p style={styles.value}>{user.studentId || "Not set"}</p>
+            )}
+          </div>
         )}
 
-        {user.role === "STAFF" && (
-          editMode ? (
-            <input
-              style={styles.input}
-              value={user.staffId || ""}
-              onChange={(e) => setUser({ ...user, staffId: e.target.value })}
-              placeholder="Staff ID"
-            />
-          ) : (
-            <p>Staff ID: {user.staffId}</p>
-          )
+        {/* ✅ STAFF ID — shown when userType is STAFF */}
+        {(user.userType === "STAFF") && (
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Staff ID</label>
+            {editMode ? (
+              <input style={styles.input} value={user.staffId || ""}
+                onChange={(e) => setUser({ ...user, staffId: e.target.value })}
+                placeholder="Staff ID" />
+            ) : (
+              <p style={styles.value}>{user.staffId || "Not set"}</p>
+            )}
+          </div>
         )}
 
         {/* BUTTONS */}
         {!editMode ? (
-          <button style={styles.btn} onClick={() => setEditMode(true)}>
-            Edit Profile
-          </button>
+          <button style={styles.btn} onClick={() => setEditMode(true)}>Edit Profile</button>
         ) : (
           <>
-            <button style={styles.btn} onClick={handleSave}>
-              Save Changes
-            </button>
-
-            <button
-              style={{ ...styles.btn, background: "#9ca3af" }}
-              onClick={() => setEditMode(false)}
-            >
+            <button style={styles.btn} onClick={handleSave}>Save Changes</button>
+            <button style={{ ...styles.btn, background: "#9ca3af" }} onClick={() => setEditMode(false)}>
               Cancel
             </button>
           </>
         )}
 
-        <button style={styles.danger} onClick={handleDisable}>
-          Disable Account
-        </button>
+        <button style={styles.danger} onClick={handleDisable}>Disable Account</button>
       </div>
     </div>
   );

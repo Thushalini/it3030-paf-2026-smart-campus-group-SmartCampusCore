@@ -53,9 +53,13 @@ public class AuthController {
     // 🔥 NEW: Google login
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> body) {
-
-        String googleToken = body.get("credential");
-
+        System.out.println(">>> /api/auth/google hit, body keys: " + body.keySet());
+        System.out.println(">>> token value: " + body.get("token"));
+        
+        String googleToken = body.get("token");
+        if (googleToken == null || googleToken.isBlank()) {
+            return ResponseEntity.badRequest().body("Missing token");
+        }
         return ResponseEntity.ok(authService.googleLogin(googleToken));
     }
 }
