@@ -19,6 +19,7 @@ import com.sliit.campus_core.ticket.mapper.TicketMapper;
 import com.sliit.campus_core.ticket.service.NotificationPublisher;
 import com.sliit.campus_core.ticket.service.TicketService;
 import com.sliit.campus_core.ticket.exception.InvalidStatusTransitionException;
+import com.sliit.campus_core.ticket.exception.MaxAttachmentsExceededException;
 import com.sliit.campus_core.ticket.exception.TicketNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,7 @@ import java.time.ZoneId;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -93,6 +95,27 @@ public class TicketServiceImpl implements TicketService {
         req.setReferenceType("TICKET");
         notificationPublisher.publishTicketCreated(req);
 
+        return ticketMapper.toResponseDTO(saved);
+    }
+
+    @Override
+    public TicketResponseDTO addImageAttachments(String ticketId, List<String> urls) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+            .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+        if (ticket.getImageAttachments() == null) {
+            ticket.setImageAttachments(new ArrayList<>());
+        }
+
+        // enforce max 3
+        if (ticket.getImageAttachments().size() + urls.size() > 3) {
+            throw new MaxAttachmentsExceededException("Cannot upload more than 3 images");
+        }
+
+        ticket.getImageAttachments().addAll(urls);
+        ticket.setUpdatedAt(Instant.now());
+
+        Ticket saved = ticketRepository.save(ticket);
         return ticketMapper.toResponseDTO(saved);
     }
 
