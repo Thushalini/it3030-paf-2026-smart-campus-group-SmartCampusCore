@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getMyTickets } from "../api/ticketApi";
 
 export default function useTickets(initialFilters = {}) {
@@ -6,24 +6,41 @@ export default function useTickets(initialFilters = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState(initialFilters);
-
-  const fetchTickets = async () => {
-    setLoading(true);
-    try {
-      const res = await getMyTickets(filters);
-      const list = res.data?.data?.content || res.data?.data || [];
-      setTickets(Array.isArray(list) ? list : []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
-    fetchTickets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(filters)]);
+    let cancelled = false;
 
-  return { tickets, loading, error, filters, refetch: fetchTickets, setFilters };
+    const fetch = async () => {
+      setLoading(true);
+      try {
+        const res = await getMyTickets(filters);
+        const pageData = res.data?.data;
+        const list = pageData?.content || pageData || [];
+        if (!cancelled) {
+          setTickets(Array.isArray(list) ? list : []);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.response?.data?.message || err.message || "Failed to fetch tickets");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetch();
+    return () => {
+      cancelled = true;
+    };
+  }, [filters, version]);
+
+  const refetch = useCallback(() => {
+    setVersion((v) => v + 1);
+  }, []);
+
+  return { tickets, loading, error, filters, setFilters, refetch };
 }

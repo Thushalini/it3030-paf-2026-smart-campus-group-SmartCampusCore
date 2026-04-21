@@ -14,9 +14,15 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
                         .allowedOrigins("http://localhost:5173")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                        .allowedHeaders("*")
                         .allowCredentials(true);
+
+                // ← ADD THIS: allow frontend to fetch images
+                registry.addMapping("/uploads/**")
+                        .allowedOrigins("http://localhost:5173")
+                        .allowedMethods("GET");
             }
         };
-    }    
+    }
 }

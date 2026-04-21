@@ -1,3 +1,5 @@
+import "./TicketFilterBar.css";
+
 export default function TicketFilterBar({ filters, onFilterChange, showAssigneeFilter = false }) {
   const handleChange = (e) => {
     onFilterChange({ ...filters, [e.target.name]: e.target.value });

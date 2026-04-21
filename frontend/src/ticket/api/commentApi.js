@@ -7,4 +7,10 @@ export const getComments = (ticketId) =>
 
 export const addComment = (ticketId, content) =>
   axios.post(`${API_BASE}/tickets/${ticketId}/comments`, { content });
+
+export const updateComment = (ticketId, commentId, content) =>
+  axios.put(`${API_BASE}/tickets/${ticketId}/comments/${commentId}`, { content });
+
+export const deleteComment = (ticketId, commentId) =>
+  axios.delete(`${API_BASE}/tickets/${ticketId}/comments/${commentId}`);
 // TODO: backend will enforce ownership via JWT claims later
