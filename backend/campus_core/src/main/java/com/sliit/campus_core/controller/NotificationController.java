@@ -61,14 +61,14 @@ public class NotificationController {
     @PostMapping("/test")
     public ResponseEntity<?> sendTestNotification(Authentication auth) {
         String email = auth.getName();
-        User user = userService.getByEmail(email); // ← get the full user object
+        User user = userService.getByEmail(email); 
 
         Notification n = new Notification();
         n.setMessage("🔔 Test notification at " + LocalDateTime.now());
         n.setType("TEST");
         n.setisRead(false);
         n.setCreatedAt(LocalDateTime.now());
-        n.setUserId(user.getId()); // ← use user.getId(), not email
+        n.setUserId(user.getId()); 
         notificationService.save(n);
 
         messagingTemplate.convertAndSend("/topic/notifications/" + user.getId(), n);

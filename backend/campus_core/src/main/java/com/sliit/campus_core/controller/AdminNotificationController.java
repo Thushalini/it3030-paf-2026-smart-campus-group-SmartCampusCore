@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sliit.campus_core.dto.NotificationWithEmail;
 import com.sliit.campus_core.entity.Notification;
 import com.sliit.campus_core.entity.NotificationLog;
 import com.sliit.campus_core.entity.Role;
@@ -100,10 +101,15 @@ public class AdminNotificationController {
     // DELETE /api/admin/notifications/log/{logId}
     // Removes an entry from the admin broadcast history
     @DeleteMapping("/log/{logId}")
-    public ResponseEntity<?> deleteLog(@PathVariable String logId) {
-        if (!logRepository.existsById(logId)) {
+        public ResponseEntity<?> deleteLog(@PathVariable String logId) {
+        NotificationLog log = logRepository.findById(logId).orElse(null);
+        if (log == null) {
             return ResponseEntity.notFound().build();
         }
+
+        // Delete all per-user notifications that were created by this broadcast
+        notificationRepository.deleteByMessageAndType(log.getMessage(), log.getType());
+
         logRepository.deleteById(logId);
         return ResponseEntity.ok(Map.of("deleted", logId));
     }
@@ -120,17 +126,66 @@ public class AdminNotificationController {
         logRepository.save(log);
     }
 
+    // @GetMapping("/all")
+    // public ResponseEntity<List<Notification>> getAllNotifications(
+    //         @RequestParam(required = false) String type) {
+    //     List<Notification> all = notificationRepository.findAll(
+    //         Sort.by(Sort.Direction.DESC, "createdAt")
+    //     );
+
+    //     if (type != null && !type.isBlank()) {
+    //         all = all.stream()
+    //                 .filter(n -> type.equalsIgnoreCase(n.getType()))
+    //                 .collect(Collectors.toList());
+    //     } else {
+    //         // Exclude ANNOUNCEMENT when no filter is applied
+    //         all = all.stream()
+    //                 .filter(n -> !"ANNOUNCEMENT".equalsIgnoreCase(n.getType()))
+    //                 .collect(Collectors.toList());
+    //     }
+
+    //     return ResponseEntity.ok(all);
+    // }
+
+
     @GetMapping("/all")
-    public ResponseEntity<List<Notification>> getAllNotifications(
+    public ResponseEntity<List<NotificationWithEmail>> getAllNotifications(
             @RequestParam(required = false) String type) {
+
         List<Notification> all = notificationRepository.findAll(
             Sort.by(Sort.Direction.DESC, "createdAt")
-        );
+        ).stream()
+        .filter(n -> !"ANNOUNCEMENT".equalsIgnoreCase(n.getType()))
+        .collect(Collectors.toList());
+
         if (type != null && !type.isBlank()) {
             all = all.stream()
                     .filter(n -> type.equalsIgnoreCase(n.getType()))
                     .collect(Collectors.toList());
         }
-        return ResponseEntity.ok(all);
+
+        // Build a userId → email map in one DB call
+        List<String> userIds = all.stream()
+                .map(Notification::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<String, String> emailMap = userRepository.findAllById(userIds)
+                .stream()
+                .collect(Collectors.toMap(User::getId, User::getEmail));
+
+        List<NotificationWithEmail> result = all.stream()
+                .map(n -> new NotificationWithEmail(
+                    n.getId(),
+                    n.getUserId(),
+                    emailMap.getOrDefault(n.getUserId(), "unknown"), // ← resolved email
+                    n.getMessage(),
+                    n.getType(),
+                    n.isRead(),
+                    n.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
     }
 }

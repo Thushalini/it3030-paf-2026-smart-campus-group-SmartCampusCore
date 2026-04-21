@@ -10,7 +10,7 @@ import {
 
 const ROLES = ["ALL", "TECHNICIAN", "USER", "ADMIN"];
 const TYPES = ["ANNOUNCEMENT", "BOOKING", "TICKET", "COMMENT"];
-const FILTER_TYPES = ["ALL", "ANNOUNCEMENT", "BOOKING", "TICKET", "COMMENT"];
+const FILTER_TYPES = ["ALL", "BOOKING", "TICKET", "COMMENT"];
 
 export default function AdminNotificationsPanel() {
   const [tab, setTab]             = useState("send");       // "send" | "inbox"
@@ -248,7 +248,7 @@ export default function AdminNotificationsPanel() {
                     <div className="flex flex-wrap gap-2 mt-1 items-center">
                       <span className={`text-xs px-2 py-0.5 rounded-full ${typeBadgeColor(n.type)}`}>{n.type}</span>
                       <span className="text-xs text-gray-400">{formatDate(n.createdAt)}</span>
-                      <span className="text-xs text-gray-400 font-mono">uid: {n.userId}</span>
+                      <span className="text-xs text-gray-400 font-mono">uid: {n.userEmail}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${n.isRead ? "bg-gray-100 text-gray-400" : "bg-yellow-100 text-yellow-700"}`}>
                         {n.isRead ? "Read" : "Unread"}
                       </span>
