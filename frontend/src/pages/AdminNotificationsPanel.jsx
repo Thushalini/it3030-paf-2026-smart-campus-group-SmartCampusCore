@@ -7,21 +7,22 @@ import {
   getAllNotificationsAdmin,
   deleteNotificationById,
 } from "../api/notificationApi";
+import AdminNotificationAnalytics from "./AdminNotificationAnalytics";
 
-const ROLES = ["ALL", "TECHNICIAN", "USER", "ADMIN"];
-const TYPES = ["ANNOUNCEMENT", "BOOKING", "TICKET", "COMMENT"];
+const ROLES        = ["ALL", "TECHNICIAN", "USER", "ADMIN"];
+const TYPES        = ["ANNOUNCEMENT", "BOOKING", "TICKET", "COMMENT"];
 const FILTER_TYPES = ["ALL", "BOOKING", "TICKET", "COMMENT"];
 
 export default function AdminNotificationsPanel() {
-  const [tab, setTab]             = useState("send");       // "send" | "inbox"
-  const [message, setMessage]     = useState("");
-  const [type, setType]           = useState("ANNOUNCEMENT");
-  const [target, setTarget]       = useState("ALL");
-  const [history, setHistory]     = useState([]);
-  const [allNotifs, setAllNotifs] = useState([]);
+  const [tab, setTab]               = useState("send");   // "send" | "inbox" | "analytics"
+  const [message, setMessage]       = useState("");
+  const [type, setType]             = useState("ANNOUNCEMENT");
+  const [target, setTarget]         = useState("ALL");
+  const [history, setHistory]       = useState([]);
+  const [allNotifs, setAllNotifs]   = useState([]);
   const [filterType, setFilterType] = useState("ALL");
-  const [sending, setSending]     = useState(false);
-  const [feedback, setFeedback]   = useState(null);
+  const [sending, setSending]       = useState(false);
+  const [feedback, setFeedback]     = useState(null);
 
   const loadHistory = async () => {
     try {
@@ -88,13 +89,14 @@ export default function AdminNotificationsPanel() {
   }[t] ?? "bg-gray-100 text-gray-600");
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
+      {/* ── Tabs ── */}
+      <div className="flex gap-10 bg-gray-100 p-1 rounded-xl w-fit">
         {[
-          { key: "send",   label: "Send Notification" },
-          { key: "inbox",  label: "All Notifications" },
+          { key: "send",      label: "✉️ Send Notification"       },
+          { key: "inbox",     label: "🔔 All Notifications" },
+          { key: "analytics", label: "📊 Analytics"  },
         ].map(({ key, label }) => (
           <button
             key={key}
@@ -110,7 +112,7 @@ export default function AdminNotificationsPanel() {
         ))}
       </div>
 
-      {/* ── Tab: Send ── */}
+      {/* ══════════════════ TAB: Send ══════════════════ */}
       {tab === "send" && (
         <>
           {/* Compose */}
@@ -191,8 +193,10 @@ export default function AdminNotificationsPanel() {
                       </div>
                       <p className="text-xs text-gray-400 mt-0.5">by {log.sentByEmail}</p>
                     </div>
-                    <button onClick={() => handleDeleteLog(log.id)}
-                      className="flex-shrink-0 text-xs text-red-400 hover:text-red-600 font-medium transition-colors mt-1">
+                    <button
+                      onClick={() => handleDeleteLog(log.id)}
+                      className="flex-shrink-0 text-xs text-red-400 hover:text-red-600 font-medium transition-colors mt-1"
+                    >
                       Delete
                     </button>
                   </div>
@@ -203,7 +207,7 @@ export default function AdminNotificationsPanel() {
         </>
       )}
 
-      {/* ── Tab: All Notifications ── */}
+      {/* ══════════════════ TAB: All Notifications ══════════════════ */}
       {tab === "inbox" && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
@@ -236,11 +240,9 @@ export default function AdminNotificationsPanel() {
             <div className="divide-y divide-gray-50 max-h-[520px] overflow-y-auto">
               {allNotifs.map((n) => (
                 <div key={n.id} className="flex items-start gap-3 px-6 py-3 hover:bg-gray-50">
-                  {/* Unread dot */}
                   <div className="mt-2 flex-shrink-0">
                     <span className={`block w-2 h-2 rounded-full ${!n.isRead ? "bg-blue-500" : "bg-gray-200"}`} />
                   </div>
-
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm break-words ${!n.isRead ? "font-semibold text-gray-900" : "text-gray-500"}`}>
                       {n.message}
@@ -254,7 +256,6 @@ export default function AdminNotificationsPanel() {
                       </span>
                     </div>
                   </div>
-
                   <button
                     onClick={() => handleDeleteNotif(n.id)}
                     className="flex-shrink-0 text-xs text-red-400 hover:text-red-600 font-medium transition-colors mt-1"
@@ -267,6 +268,12 @@ export default function AdminNotificationsPanel() {
           )}
         </div>
       )}
+
+      {/* ══════════════════ TAB: Analytics ══════════════════ */}
+      {tab === "analytics" && (
+        <AdminNotificationAnalytics history={history} allNotifs={allNotifs} />
+      )}
+
     </div>
   );
 }
