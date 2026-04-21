@@ -31,7 +31,7 @@ public class NotificationService {
         if (!allowed) return;
 
         Notification n = new Notification();
-        n.setUserId(user.getEmail());
+        n.setUserId(user.getId());
         n.setMessage(message);
         n.setType(type);
         n.setCreatedAt(LocalDateTime.now());
