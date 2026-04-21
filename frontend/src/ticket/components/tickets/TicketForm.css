@@ -1,164 +1,238 @@
-/* ── Smart Campus Design Tokens ── */
-:root {
-  --primary: #0ea5e9;           /* Sky 500 - Smart/Tech */
-  --primary-hover: #0284c7;     /* Sky 600 */
-  --primary-light: #e0f2fe;     /* Sky 100 */
-  --accent: #10b981;            /* Emerald 500 - Operations/Success */
-  --bg: #f8fafc;                /* Slate 50 */
-  --surface: #ffffff;
-  --text: #1e293b;              /* Slate 800 */
-  --text-secondary: #64748b;    /* Slate 500 */
-  --border: #cbd5e1;            /* Slate 300 */
-  --border-focus: var(--primary);
-  --radius: 0.5rem;
-  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
-
 /* ── Form Container ── */
-form {
-  max-width: 720px;
-  margin: 2.5rem auto;
-  padding: 2rem;
-  background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  color: var(--text);
+.ticket-form {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem 2.5rem;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border: 1px solid #e2e8f0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem 1.5rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #0f172a;
   animation: slideUp 0.4s ease-out;
 }
 
-/* ── Base Inputs ── */
-form input,
-form select,
-form textarea {
+/* ── Full-width elements ── */
+.ticket-form .form-header,
+.ticket-form .form-section,
+.ticket-form .field-full,
+.ticket-form .upload-wrapper,
+.ticket-form button[type="submit"] {
+  grid-column: 1 / -1;
+}
+
+/* ── Header ── */
+.form-header {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.form-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.form-header p {
+  margin: 0.5rem 0 0;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+/* ── Section Labels ── */
+.form-section {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0369a1;
+  margin-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e0f2fe;
+}
+
+/* ── Field Groups ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+/* ── Inputs ── */
+.ticket-form input,
+.ticket-form select,
+.ticket-form textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.8rem 1rem;
   font-size: 0.95rem;
-  line-height: 1.5;
-  color: var(--text);
-  background-color: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
+  color: #0f172a;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 0.625rem;
   transition: all 0.2s ease;
   outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
 }
 
-form input::placeholder,
-form textarea::placeholder {
-  color: var(--text-secondary);
-  opacity: 0.9;
+.ticket-form input::placeholder,
+.ticket-form textarea::placeholder {
+  color: #94a3b8;
 }
 
-/* ── Focus States ── */
-form input:focus,
-form select:focus,
-form textarea:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px var(--primary-light);
+.ticket-form input:focus,
+.ticket-form select:focus,
+.ticket-form textarea:focus {
+  background: #ffffff;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px #e0f2fe;
 }
 
-/* ── Select Dropdown ── */
-form select {
+/* ── Select ── */
+.ticket-form select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.75rem center;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.85rem center;
   background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
+  background-size: 1.25em;
   padding-right: 2.5rem;
   cursor: pointer;
 }
 
-/* Placeholder color for unselected required selects */
-form select:invalid {
-  color: var(--text-secondary);
-}
-
-form select option {
-  color: var(--text);
-  background: var(--surface);
+.ticket-form select:invalid {
+  color: #94a3b8;
 }
 
 /* ── Textarea ── */
-form textarea {
+.ticket-form textarea {
   min-height: 120px;
   resize: vertical;
-  font-family: inherit;
+  line-height: 1.6;
 }
 
-/* ── Auto-filled Location (Read-Only) ── */
-form input[name="location"] {
-  background-color: #f1f5f9; /* Slate 100 */
+/* ── Read-only Location ── */
+.ticket-form input[name="location"] {
+  background: #f1f5f9;
   border-style: dashed;
   border-color: #94a3b8;
-  color: var(--text-secondary);
+  color: #64748b;
   cursor: not-allowed;
   font-style: italic;
 }
 
-/* ── Contact Details Grouping ── */
-/* Adds a subtle visual separator before the contact section starts */
-form input[name="contactName"] {
+/* ── Upload Zone ── */
+.upload-wrapper {
   margin-top: 0.5rem;
-  border-top: 3px solid var(--primary-light);
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
 }
 
-/* ── Image Uploader Zone ── */
-/* Targets the ImageUploader wrapper div. If your ImageUploader renders
-   something other than a <div>, wrap it in: <div className="upload-zone"> */
-form > div {
-  padding: 1.5rem 1rem;
-  border: 2px dashed var(--border);
-  border-radius: var(--radius);
-  background-color: var(--bg);
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  transition: border-color 0.2s, background-color 0.2s;
+.upload-wrapper > label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.upload-zone {
+  position: relative;
+  min-height: 180px;
+  border: 2px dashed #0ea5e9;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+  border-color: #0284c7;
+  background: #e0f2fe;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px -10px rgba(14, 165, 233, 0.25);
+}
+
+/* Hide default file input */
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
   cursor: pointer;
+  z-index: 2;
 }
 
-form > div:hover {
-  border-color: var(--primary);
-  background-color: var(--primary-light);
+/* Custom visual content */
+.upload-zone .upload-content {
+  pointer-events: none;
+  text-align: center;
+  z-index: 1;
+  padding: 2rem;
+}
+
+.upload-zone .upload-content::before {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230ea5e9' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M12 16.5V9.75m0 0l-3 3m3-3l3 3M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z'/%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 12.75l3 3m0 0l3-3m-3 3v-7.5'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.upload-zone .upload-content p {
+  margin: 0 0 0.25rem;
+  color: #0369a1;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.upload-zone .upload-content span {
+  font-size: 0.875rem;
+  color: #64748b;
 }
 
 /* ── Submit Button ── */
-form button[type="submit"] {
-  margin-top: 0.5rem;
-  padding: 0.875rem 1.75rem;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+.ticket-form button[type="submit"] {
+  justify-self: center;
+  padding: 0.9rem 3rem;
+  font-size: 1.05rem;
+  font-weight: 700;
   color: white;
-  background: linear-gradient(135deg, var(--primary), #38bdf8);
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
   border: none;
-  border-radius: var(--radius);
+  border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: var(--shadow);
-  width: 100%;
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 4px 14px 0 rgba(14, 165, 233, 0.35);
+  margin-top: 0.5rem;
 }
 
-form button[type="submit"]:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--primary-hover), #0ea5e9);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+.ticket-form button[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.25);
 }
 
-form button[type="submit"]:active:not(:disabled) {
+.ticket-form button[type="submit"]:active:not(:disabled) {
   transform: translateY(0);
 }
 
-form button[type="submit"]:disabled {
+.ticket-form button[type="submit"]:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   filter: grayscale(0.4);
@@ -166,25 +240,15 @@ form button[type="submit"]:disabled {
 
 /* ── Animations ── */
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Responsive ── */
-@media (min-width: 640px) {
-  form {
-    padding: 2.5rem;
-  }
-
-  form button[type="submit"] {
-    width: auto;
-    align-self: flex-end;
-    min-width: 180px;
+@media (max-width: 640px) {
+  .ticket-form {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+    margin: 1rem;
   }
 }

@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -88,7 +89,7 @@ public class TicketController {
             @RequestParam(required = false) String resourceId,
             @RequestParam(required = false) String search,
             @AuthenticationPrincipal UserDetails userDetails,
-            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         String userId = "user123"; // TODO: replace with JWT claims
 
@@ -183,7 +184,7 @@ public class TicketController {
             @RequestParam(required = false) TicketCategory category,
             @RequestParam(required = false) String resourceId,
             @AuthenticationPrincipal UserDetails userDetails,
-            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         // TODO: replace stubbed values with JWT claims
         String userId = "user123";

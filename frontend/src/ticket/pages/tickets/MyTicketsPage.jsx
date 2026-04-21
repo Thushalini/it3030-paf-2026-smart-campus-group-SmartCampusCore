@@ -1,36 +1,73 @@
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import useTickets from "../../hooks/useTickets";
 import TicketCard from "../../components/tickets/TicketCard";
 import TicketFilterBar from "../../components/tickets/TicketFilterBar";
+import "./MyTicketsPage.css";
 
 export default function MyTicketsPage() {
-  const { tickets, loading, error, filters, setFilters } = useTickets({});
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { tickets, loading, error, filters, setFilters, refetch } = useTickets({});
+  const isFirstRender = useRef(true);
+
+  // Refetch when navigating back to this page, but NOT on initial mount
+  // (useTickets already fetches on mount)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    refetch();
+  }, [location.key, refetch]);
+
+  const handleTicketClick = (ticket) => {
+    navigate(`/tickets/${ticket.id}`);
+  };
 
   return (
-    <div>
+    <div className="my-tickets-page">
       <h2>My Tickets</h2>
+
       <TicketFilterBar
         filters={filters}
         onFilterChange={setFilters}
         showAssigneeFilter={false}
       />
 
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
+      {loading && <div className="loading-state">Loading tickets...</div>}
+      {error && <div className="error-state">Error: {error}</div>}
+
       {!loading && tickets.length === 0 ? (
-        <p>No tickets yet. Raise your first incident.</p>
+        <div className="empty-state">
+          <p>No tickets yet. Raise your first incident.</p>
+          <button
+            className="btn-create-ticket"
+            onClick={() => navigate("/tickets/create")}
+          >
+            Raise New Ticket
+          </button>
+        </div>
       ) : (
-        tickets.map((ticket) => (
-          <TicketCard
-            key={ticket.id}
-            ticket={ticket}
-            onClick={() => console.log("Navigate to detail")}
-          />
-        ))
+        <div className="tickets-list">
+          {tickets.map((ticket) => (
+            <TicketCard
+              key={ticket.id}
+              ticket={ticket}
+              onClick={handleTicketClick}
+            />
+          ))}
+        </div>
       )}
 
-      <button onClick={() => console.log("Navigate to CreateTicketPage")}>
-        Raise New Ticket
-      </button>
+      {tickets.length > 0 && (
+        <button
+          className="btn-create-ticket"
+          onClick={() => navigate("/tickets/create")}
+        >
+          + Raise New Ticket
+        </button>
+      )}
     </div>
   );
 }

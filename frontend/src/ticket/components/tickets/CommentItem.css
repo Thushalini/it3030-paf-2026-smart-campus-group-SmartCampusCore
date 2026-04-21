@@ -1,0 +1,149 @@
+.comment-item {
+  padding: 1rem 1.25rem;
+  background: #f8fafc;
+  border-radius: 0.625rem;
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s;
+}
+
+.comment-item:hover {
+  border-color: #e2e8f0;
+}
+
+.comment-item.comment-deleted {
+  opacity: 0.6;
+  background: #f1f5f9;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.author-name {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.role-badge {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.role-user {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.role-admin {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.role-technician {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.comment-time {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.edited-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #0ea5e9;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.btn-text:hover {
+  background: #e0f2fe;
+}
+
+.btn-text.btn-danger {
+  color: #ef4444;
+}
+
+.btn-text.btn-danger:hover {
+  background: #fef2f2;
+}
+
+.comment-content {
+  margin: 0;
+  color: #334155;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.comment-edit textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 0.5rem;
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+  box-sizing: border-box;
+  margin-bottom: 0.75rem;
+}
+
+.comment-edit textarea:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px #e0f2fe;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+}
