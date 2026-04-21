@@ -24,7 +24,7 @@ public interface TicketService {
                                     String currentUserId,
                                     String currentRole);
 
-    Page<TicketResponseDTO> getMyTickets(String currentUserId, Pageable pageable);    
+    Page<TicketResponseDTO> getMyTickets(TicketFilterRequestDTO filter, Pageable pageable);
 
     TicketResponseDTO updateTicketStatus(String ticketId,
                                          TicketUpdateStatusRequestDTO dto,

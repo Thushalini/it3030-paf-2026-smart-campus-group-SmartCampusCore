@@ -13,6 +13,7 @@ public class TicketFilterRequestDTO {
     private String resourceId;
     private String assignedToId;
     private String reportedById;
+    private String search;
     private int page = 0;
     private int size = 10;
     private String sortBy = "createdAt";

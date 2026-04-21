@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import TicketForm from "../../ticket/components/tickets/TicketForm";
-import { createTicket, uploadAttachments } from "../../ticket/api/ticketApi";
+import TicketForm from "../../components/tickets/TicketForm";
+import { createTicket, uploadAttachments } from "../../api/ticketApi";
 
 export default function CreateTicketPage() {
   const navigate = useNavigate();

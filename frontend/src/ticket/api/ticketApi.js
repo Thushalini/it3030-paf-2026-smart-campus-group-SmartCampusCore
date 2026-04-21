@@ -13,9 +13,24 @@ export const createTicket = (ticketData) =>
 export const uploadAttachments = (ticketId, files) => {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
-
   return axios.post(`${API_BASE}/tickets/${ticketId}/attachments`, formData, {
     headers: { "Content-Type": "multipart/form-data" }
+    // TODO: add Authorization header once Member 4 JWT is integrated
+  });
+};
+
+// Fetch current user's tickets (with optional filters)
+export const getMyTickets = (filters = {}) => {
+  // Build query string from filters
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      params.append(key, value);
+    }
+  });
+
+  return axios.get(`${API_BASE}/tickets/my?${params.toString()}`, {
+    headers: { "Content-Type": "application/json" }
     // TODO: add Authorization header once Member 4 JWT is integrated
   });
 };
