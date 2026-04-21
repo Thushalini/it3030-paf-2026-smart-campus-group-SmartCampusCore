@@ -84,6 +84,16 @@ public class TicketServiceImpl implements TicketService {
         ticket.setCreatedAt(Instant.now());
         ticket.setUpdatedAt(Instant.now());
 
+        ticket.setAssignedToId(null);
+        ticket.setAssignedToName(null);
+        ticket.setRejectionReason(null);
+        ticket.setResolutionNote(null);
+        ticket.setFirstResponseAt(null);
+        ticket.setResolvedAt(null);
+        ticket.setClosedAt(null);
+        ticket.setFirstResponseTimeMinutes(null);
+        ticket.setResolutionTimeMinutes(null);
+
         Ticket saved = ticketRepository.save(ticket);
 
         NotificationRequestDTO req = new NotificationRequestDTO();
