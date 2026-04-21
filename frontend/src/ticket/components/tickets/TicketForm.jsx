@@ -225,8 +225,10 @@ export default function TicketForm({ onSubmit, loading, initialValues }) {
       </select>
 
       {/* Image uploader */}
-      <ImageUploader onChange={setFiles} maxFiles={3} />
-
+      <div className="upload-zone">
+        <ImageUploader onChange={setFiles} maxFiles={3} />
+      </div>
+      
       <button type="submit" disabled={loading}>Create Ticket</button>
     </form>
   );
