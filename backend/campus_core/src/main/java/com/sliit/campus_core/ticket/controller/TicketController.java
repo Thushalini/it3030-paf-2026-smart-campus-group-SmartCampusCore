@@ -79,15 +79,29 @@ public class TicketController {
         return ResponseEntity.ok(ApiResponse.success("Ticket fetched successfully", ticket));
     }
 
-    // GET /api/v1/tickets/my → fetch current user's tickets
+    // GET /api/v1/tickets/my → fetch current user's tickets with filters
     @GetMapping("/my")
     public ResponseEntity<ApiResponse<?>> getMyTickets(
+            @RequestParam(required = false) TicketStatus status,
+            @RequestParam(required = false) TicketPriority priority,
+            @RequestParam(required = false) TicketCategory category,
+            @RequestParam(required = false) String resourceId,
+            @RequestParam(required = false) String search,
             @AuthenticationPrincipal UserDetails userDetails,
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
 
-        String userId = "user123"; // stubbed
+        String userId = "user123"; // TODO: replace with JWT claims
+
+        TicketFilterRequestDTO filter = new TicketFilterRequestDTO();
+        filter.setStatus(status);
+        filter.setPriority(priority);
+        filter.setCategory(category);
+        filter.setResourceId(resourceId);
+        filter.setSearch(search);           // ← was missing
+        filter.setReportedById(userId);
+
         return ResponseEntity.ok(ApiResponse.success("My tickets fetched successfully",
-                ticketService.getMyTickets(userId, pageable)));
+                ticketService.getMyTickets(filter, pageable)));
     }
 
     @PatchMapping("/{id}/status")

@@ -23,6 +23,7 @@ import com.sliit.campus_core.ticket.exception.MaxAttachmentsExceededException;
 import com.sliit.campus_core.ticket.exception.TicketNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -146,9 +147,22 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Page<TicketResponseDTO> getMyTickets(String currentUserId, Pageable pageable) {
-        return ticketRepository.findByReportedByIdOrderByCreatedAtDesc(currentUserId, pageable)
-                .map(ticketMapper::toResponseDTO);
+    public Page<TicketResponseDTO> getMyTickets(TicketFilterRequestDTO filter, Pageable pageable) {
+        Page<Ticket> page = ticketRepository.findByReportedByIdOrderByCreatedAtDesc(filter.getReportedById(), pageable);
+
+        // Apply filters manually (simplified for now)
+        List<TicketResponseDTO> filtered = page.stream()
+            .filter(t -> filter.getStatus() == null || t.getStatus() == filter.getStatus())
+            .filter(t -> filter.getPriority() == null || t.getPriority() == filter.getPriority())
+            .filter(t -> filter.getCategory() == null || t.getCategory() == filter.getCategory())
+            .filter(t -> filter.getResourceId() == null || t.getResourceId().equals(filter.getResourceId()))
+            .filter(t -> filter.getSearch() == null 
+                || t.getTitle().toLowerCase().contains(filter.getSearch().toLowerCase()) 
+                || t.getDescription().toLowerCase().contains(filter.getSearch().toLowerCase())) // ✅ search filter
+            .map(ticketMapper::toResponseDTO)
+            .toList();
+
+        return new PageImpl<>(filtered, pageable, filtered.size());
     }
 
     @Override
