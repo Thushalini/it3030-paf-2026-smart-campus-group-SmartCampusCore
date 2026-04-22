@@ -1,0 +1,100 @@
+/* src/ticket/components/tickets/TicketTable.css */
+
+.ticket-table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  margin-top: 20px;
+}
+
+.ticket-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.ticket-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #1e293b;
+  border-bottom: 1px solid #e2e8f0;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.ticket-table th:hover {
+  background-color: #f1f5f9;
+}
+
+.ticket-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.ticket-table tr:hover {
+  background-color: #fefce8;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.actions-cell button {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-view {
+  background: #e6f0ff;
+  color: #1e40af;
+}
+.btn-view:hover {
+  background: #bfdbfe;
+}
+
+.btn-status {
+  background: #fef3c7;
+  color: #92400e;
+}
+.btn-status:hover {
+  background: #fde68a;
+}
+
+.btn-assign {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+.btn-assign:hover {
+  background: #c7d2fe;
+}
+
+.loading-table,
+.empty-table {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .ticket-table th,
+  .ticket-table td {
+    padding: 8px 10px;
+  }
+  .actions-cell {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

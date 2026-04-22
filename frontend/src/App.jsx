@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react
 import CreateTicketPage from "./ticket/pages/tickets/CreateTicketPage.jsx";
 import MyTicketsPage from "./ticket/pages/tickets/MyTicketsPage.jsx";
 import TicketDetailPage from "./ticket/pages/tickets/TicketDetailPage.jsx";
+import AdminTicketManagementPage from "./ticket/pages/tickets/AdminTicketManagementPage.jsx";
+import TechnicianTicketsPage from "./ticket/pages/tickets/TechnicianTicketsPage.jsx";
 import "./App.css";
 
 function NavLink({ to, children }) {
@@ -36,6 +38,8 @@ function App() {
             <Route path="/tickets/create" element={<CreateTicketPage />} />
             <Route path="/tickets/my" element={<MyTicketsPage />} />
             <Route path="/tickets/:id" element={<TicketDetailPage />} />
+            <Route path="/admin/tickets" element={<AdminTicketManagementPage />} />
+            <Route path="/technician/tickets" element={<TechnicianTicketsPage />} />
           </Routes>
         </main>
       </div>
