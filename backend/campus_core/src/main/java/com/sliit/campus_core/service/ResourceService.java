@@ -1,16 +1,5 @@
 package com.sliit.campus_core.service;
 
-import com.sliit.campus_core.dto.ResourceAnalyticsResponse;
-import com.sliit.campus_core.dto.ResourceCreateRequest;
-import com.sliit.campus_core.dto.ResourceUpdateRequest;
-import com.sliit.campus_core.entity.Resource;
-import com.sliit.campus_core.entity.ResourceStatus;
-import com.sliit.campus_core.entity.ResourceType;
-import com.sliit.campus_core.exception.BadRequestException;
-import com.sliit.campus_core.exception.ResourceNotFoundException;
-import com.sliit.campus_core.repository.ResourceRepository;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,6 +10,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.sliit.campus_core.dto.ResourceAnalyticsResponse;
+import com.sliit.campus_core.dto.ResourceCreateRequest;
+import com.sliit.campus_core.dto.ResourceUpdateRequest;
+import com.sliit.campus_core.entity.Resource;
+import com.sliit.campus_core.entity.ResourceStatus;
+import com.sliit.campus_core.entity.ResourceType;
+import com.sliit.campus_core.exception.BadRequestException;
+import com.sliit.campus_core.exception.ResourceNotFoundException;
+import com.sliit.campus_core.repository.ResourceRepository;
 
 @Service
 public class ResourceService {
@@ -138,8 +139,8 @@ public class ResourceService {
         existing.setFeatures(request.getFeatures());
         existing.setImageUrls(normalizeImageUrls(request.getImageUrls()));
         existing.setRatingAverage(request.getRatingAverage() != null ? request.getRatingAverage() : 0.0);
-        existing.setRatingCount(request.getRatingCount() != null ? request.getRatingCount() : 0);
-        existing.setBookingCount(request.getBookingCount() != null ? request.getBookingCount() : 0);
+        existing.setRatingCount(request.getRatingCount() != null ? request.getRatingCount().intValue() : 0);
+        existing.setBookingCount(request.getBookingCount() != null ? request.getBookingCount().intValue() : 0);
         existing.setUpdatedAt(Instant.now());
 
         return resourceRepository.save(existing);
@@ -315,9 +316,9 @@ public class ResourceService {
         return value == null ? 0 : value;
     }
 
-    private double safeDouble(Double value) {
-        return value == null ? 0.0 : value;
-    }
+    // private double safeDouble(Double value) {
+    //     return value == null ? 0.0 : value;
+    // }
 
     private double safeDoubleNullable(Double value) {
         return value == null ? Double.MAX_VALUE : value;

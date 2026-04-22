@@ -11,6 +11,12 @@ import AdminManageUsers from "../pages/AdminManageUsers";
 import AdminDisabledUsers from "../pages/AdminDisabledUsers";
 import AdminNotificationsPanel from "../pages/AdminNotificationsPanel";
 
+import StudentResourcesPage from "../pages/StudentResourcesPage";
+import ResourceDetailsPage from "../pages/ResourceDetailsPage";
+import AdminResourcesPage from "../pages/AdminResourcesPage";
+import ResourceFormPage from "../pages/ResourceFormPage";
+import ResourceAnalyticsPage from "../pages/ResourceAnalyticsPage";
+
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -37,6 +43,8 @@ const AppRoutes = () => {
           }
         >
           <Route index element={<Profile />} />
+          <Route path="resources" element={<StudentResourcesPage />} />
+          <Route path="resources/:id" element={<ResourceDetailsPage />} />
         </Route>
 
         <Route
@@ -63,6 +71,12 @@ const AppRoutes = () => {
           <Route path="manage-users" element={<AdminManageUsers />} />
           <Route path="disabled-users" element={<AdminDisabledUsers />} />
           <Route path="notifications" element={<AdminNotificationsPanel />} />
+
+          <Route path="resources" element={<AdminResourcesPage />} />
+          <Route path="resources/new" element={<ResourceFormPage />} />
+          <Route path="resources/edit/:id" element={<ResourceFormPage />} />
+          <Route path="resources/view/:id" element={<ResourceDetailsPage />} />
+          <Route path="resources/analytics" element={<ResourceAnalyticsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

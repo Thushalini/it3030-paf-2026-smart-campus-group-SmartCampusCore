@@ -12,19 +12,19 @@ function StudentDashboardPage() {
       </div>
 
       <div className="dashboard-card-grid">
-        <Link to="/student/resources" className="dashboard-card">
+        <Link to="/resources" className="dashboard-card">
           <div className="dashboard-icon">🏫</div>
           <h3>Browse Resources</h3>
           <p>View lecture halls, labs, meeting rooms, and equipment.</p>
         </Link>
 
-        <Link to="/student/resources" className="dashboard-card">
+        <Link to="/resources" className="dashboard-card">
           <div className="dashboard-icon">⭐</div>
           <h3>Top Rated Resources</h3>
           <p>See the most highly rated and popular resources.</p>
         </Link>
 
-        <Link to="/student/resources" className="dashboard-card">
+        <Link to="/resources" className="dashboard-card">
           <div className="dashboard-icon">🔍</div>
           <h3>Search & Filter</h3>
           <p>Quickly find resources by type, location, and other details.</p>
