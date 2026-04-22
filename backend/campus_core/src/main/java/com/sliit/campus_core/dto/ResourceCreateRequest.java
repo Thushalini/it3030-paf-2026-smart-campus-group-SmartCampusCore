@@ -1,9 +1,9 @@
 package com.sliit.campus_core.dto;
 
-import com.sliit.campus_core.model.ResourceStatus;
-import com.sliit.campus_core.model.ResourceType;
-
 import java.util.List;
+
+import com.sliit.campus_core.entity.ResourceStatus;
+import com.sliit.campus_core.entity.ResourceType;
 
 public class ResourceCreateRequest {
 

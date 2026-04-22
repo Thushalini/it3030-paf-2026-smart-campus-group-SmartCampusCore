@@ -3,11 +3,11 @@ package com.sliit.campus_core.service;
 import com.sliit.campus_core.dto.ResourceAnalyticsResponse;
 import com.sliit.campus_core.dto.ResourceCreateRequest;
 import com.sliit.campus_core.dto.ResourceUpdateRequest;
+import com.sliit.campus_core.entity.Resource;
+import com.sliit.campus_core.entity.ResourceStatus;
+import com.sliit.campus_core.entity.ResourceType;
 import com.sliit.campus_core.exception.BadRequestException;
 import com.sliit.campus_core.exception.ResourceNotFoundException;
-import com.sliit.campus_core.model.Resource;
-import com.sliit.campus_core.model.ResourceStatus;
-import com.sliit.campus_core.model.ResourceType;
 import com.sliit.campus_core.repository.ResourceRepository;
 import org.springframework.stereotype.Service;
 

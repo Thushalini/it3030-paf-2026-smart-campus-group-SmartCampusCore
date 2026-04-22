@@ -1,4 +1,4 @@
-package com.sliit.campus_core.model;
+package com.sliit.campus_core.entity;
 
 public enum ResourceType {
     LECTURE_HALL,

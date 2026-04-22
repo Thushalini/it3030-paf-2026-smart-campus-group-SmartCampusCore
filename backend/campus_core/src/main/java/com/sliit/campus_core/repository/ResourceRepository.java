@@ -1,7 +1,8 @@
 package com.sliit.campus_core.repository;
 
-import com.sliit.campus_core.model.Resource;
 import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.sliit.campus_core.entity.Resource;
 
 import java.util.Optional;
 

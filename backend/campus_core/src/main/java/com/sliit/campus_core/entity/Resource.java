@@ -1,4 +1,4 @@
-package com.sliit.campus_core.model;
+package com.sliit.campus_core.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
