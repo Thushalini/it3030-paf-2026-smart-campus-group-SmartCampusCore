@@ -9,7 +9,7 @@ function ResourceDetailsPage() {
   const location = useLocation();
 
   const isAdminView = location.pathname.startsWith("/admin");
-  const backPath = isAdminView ? "/admin/resources" : "/student/resources";
+  const backPath = isAdminView ? "/admin/resources" : "/user/resources";
   const backLabel = isAdminView
     ? "Back to Admin Resources"
     : "Back to Resources";
