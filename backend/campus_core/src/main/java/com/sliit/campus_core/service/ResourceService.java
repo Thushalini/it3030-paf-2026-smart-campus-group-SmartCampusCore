@@ -11,6 +11,7 @@ import com.sliit.campus_core.exception.ResourceNotFoundException;
 import com.sliit.campus_core.repository.ResourceRepository;
 import org.springframework.stereotype.Service;
 
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -119,7 +120,7 @@ public class ResourceService {
 
         validateRequest(request.getName(), request.getResourceCode(), request.getType() != null, request.getCapacity(), request.getLocation(), request.getStatus() != null);
 
-        if (!existing.getResourceCode().equals(request.getResourceCode())
+        if (!Objects.equals(existing.getResourceCode(), request.getResourceCode())
                 && resourceRepository.existsByResourceCode(request.getResourceCode())) {
             throw new BadRequestException("Resource code already exists");
         }
@@ -315,9 +316,9 @@ public class ResourceService {
         return value == null ? 0 : value;
     }
 
-    private double safeDouble(Double value) {
-        return value == null ? 0.0 : value;
-    }
+    //private double safeDouble(Double value) {
+        //return value == null ? 0.0 : value;
+    //}
 
     private double safeDoubleNullable(Double value) {
         return value == null ? Double.MAX_VALUE : value;
