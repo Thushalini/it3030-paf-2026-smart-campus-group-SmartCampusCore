@@ -1,0 +1,63 @@
+/* src/ticket/pages/tickets/TechnicianTicketsPage.css */
+
+.technician-tickets-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.technician-tickets-page h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 24px;
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tabs button:hover {
+  color: #3b82f6;
+}
+
+.tab-active {
+  color: #3b82f6 !important;
+  border-bottom-color: #3b82f6 !important;
+}
+
+/* Optional: add a badge count inside tab (already handled inline) */
+.tabs button span {
+  margin-left: 6px;
+  font-size: 0.75rem;
+  background: #e2e8f0;
+  padding: 2px 6px;
+  border-radius: 20px;
+}
+
+@media (max-width: 640px) {
+  .technician-tickets-page {
+    padding: 16px;
+  }
+  .tabs button {
+    padding: 8px 12px;
+    font-size: 0.875rem;
+  }
+}
