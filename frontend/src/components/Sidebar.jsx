@@ -1,10 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 const Sidebar = () => {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
   const role = user?.role;
+
+  // ✅ Define linkStyle function
+  const linkStyle = (path) => ({
+    color: "white",
+    display: "block",
+    padding: "8px 12px",
+    borderRadius: "6px",
+    textDecoration: "none",
+    backgroundColor: location.pathname === path ? "#1d4ed8" : "transparent",
+  });
 
   return (
     <div style={{
@@ -12,61 +23,50 @@ const Sidebar = () => {
       height: "100vh",
       background: "#1e3a8a",
       color: "white",
-      padding: "20px"
+      padding: "20px",
     }}>
-      <h2>Smart Campus</h2>
+      <h2 style={{ marginBottom: "24px" }}>Smart Campus</h2>
 
-      <ul style={{ listStyle: "none", padding: 0 }}>
-
-        {/* COMMON
-        <li><Link to="/dashboard" style={{ color: "white" }}>Dashboard</Link></li> */}
+      <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "4px" }}>
 
         {/* 👤 USER */}
         {role === "USER" && (
           <>
-            <li><Link to="/user" style={{ color: "white" }}>My Profile</Link></li>
-            <li><Link to="/bookings" style={{ color: "white" }}>My Bookings</Link></li>
-            <li><Link to="/tickets" style={{ color: "white" }}>My Tickets</Link></li>
+            <li><Link to="/user" style={linkStyle("/user")}>👤 My Profile</Link></li>
+            {/* ✅ Fixed: was /resources, must be /user/resources */}
+            <li><Link to="/user/resources" style={linkStyle("/user/resources")}>📦 Resources</Link></li>
+            <li><Link to="/bookings" style={linkStyle("/bookings")}>📅 My Bookings</Link></li>
+            <li><Link to="/tickets" style={linkStyle("/tickets")}>🎫 My Tickets</Link></li>
           </>
         )}
 
         {/* 🛠 TECHNICIAN */}
         {role === "TECHNICIAN" && (
           <>
-            <li><Link to="/technician" style={{ color: "white" }}>Profile</Link></li>
+            <li><Link to="/technician" style={linkStyle("/technician")}>👤 Profile</Link></li>
           </>
         )}
 
         {/* 👑 ADMIN */}
         {role === "ADMIN" && (
           <>
-            <li>
-              <Link 
-                to="/admin" 
-                className="block px-3 py-2 rounded hover:bg-blue-700"
-              >
-                Admin Profile
-              </Link>
-            </li>
+            <li><Link to="/admin" style={linkStyle("/admin")}>👤 Admin Profile</Link></li>
 
-            <li>
-              <Link 
-                to="/admin/manage-users" 
-                className="block px-3 py-2 rounded hover:bg-blue-700"
-              >
-                Manage Users
-              </Link>
+            {/* Users Section */}
+            <li style={{ marginTop: "12px", fontSize: "11px", color: "#93c5fd", textTransform: "uppercase", padding: "0 12px" }}>
+              Users
             </li>
+            <li><Link to="/admin/manage-users" style={linkStyle("/admin/manage-users")}>👥 Manage Users</Link></li>
+            <li><Link to="/admin/disabled-users" style={linkStyle("/admin/disabled-users")}>🚫 Disabled Users</Link></li>
+            <li><Link to="/admin/notifications" style={linkStyle("/admin/notifications")}>🔔 Notifications</Link></li>
 
-            <li>
-              <Link 
-                to="/admin/notifications" 
-                className="block px-3 py-2 rounded hover:bg-blue-700"
-              >
-                Notifications
-              </Link>
+            {/* Resources Section */}
+            <li style={{ marginTop: "12px", fontSize: "11px", color: "#93c5fd", textTransform: "uppercase", padding: "0 12px" }}>
+              Resources
             </li>
-
+            <li><Link to="/admin/resources" style={linkStyle("/admin/resources")}>🗂️ Manage Resources</Link></li>
+            <li><Link to="/admin/resources/new" style={linkStyle("/admin/resources/new")}>➕ Add New Resource</Link></li>
+            <li><Link to="/admin/resources/analytics" style={linkStyle("/admin/resources/analytics")}>📊 Analytics</Link></li>
           </>
         )}
 
