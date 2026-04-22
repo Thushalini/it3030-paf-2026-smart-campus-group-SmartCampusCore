@@ -462,19 +462,7 @@ function ResourceAnalyticsPage() {
         </div>
       </div>
 
-      <div className="analytics-panel insights">
-        <h2>Smart Insights</h2>
-        <ul>
-          {insights.map((item, idx) => (
-            <li key={idx} className="insight-item">
-              <span className="insight-icon" aria-hidden="true">
-                {item.icon}
-              </span>
-              <span className="insight-text">{item.text}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+     
     </div>
   );
 }

@@ -2,7 +2,7 @@ package com.sliit.campus_core.controller;
 
 import com.sliit.campus_core.dto.ResourceCreateRequest;
 import com.sliit.campus_core.dto.ResourceUpdateRequest;
-import com.sliit.campus_core.model.Resource;
+import com.sliit.campus_core.entity.Resource;
 import com.sliit.campus_core.service.ResourceService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
