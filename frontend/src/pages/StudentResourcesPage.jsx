@@ -81,6 +81,13 @@ function StudentResourcesPage() {
     )[0];
   }, [filteredResources]);
 
+  // Add this helper function inside StudentResourcesPage, above return()
+  const fixImageUrl = (url) => {
+    if (!url) return "https://images.unsplash.com/photo-1497366412874-3415097a27e7";
+    // Replace wrong port 8084 with correct port 8080
+    return url.replace("localhost:8084", "localhost:8080");
+  };
+
   const renderFeatureCard = (title, resource, badgeClass, badgeText) => {
     if (!resource) return null;
 
@@ -110,7 +117,7 @@ function StudentResourcesPage() {
             <span><strong>Rating:</strong> {resource.ratingAverage ?? 0}</span>
             <span><strong>Bookings:</strong> {resource.bookingCount ?? 0}</span>
           </div>
-          <Link to={`/student/resources/${resource.id}`} className="feature-button">
+          <Link to={`/user/resources/${resource.id}`} className="feature-button">
             Explore Details
           </Link>
         </div>
@@ -218,7 +225,7 @@ function StudentResourcesPage() {
                   {resource.status}
                 </div>
 
-                <Link to={`/student/resources/${resource.id}`} className="view-button">
+                <Link to={`/user/resources/${resource.id}`} className="view-button">
                   View Details
                 </Link>
               </div>
