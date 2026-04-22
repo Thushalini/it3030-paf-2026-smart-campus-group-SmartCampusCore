@@ -12,7 +12,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/resources")
-public class ResourceController {
+public class TicketResourceController {
     @Autowired
     private MongoTemplate mongoTemplate;
 
