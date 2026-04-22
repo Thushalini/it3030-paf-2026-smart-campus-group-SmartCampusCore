@@ -1,0 +1,95 @@
+.create-ticket-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 2rem 1rem 4rem;
+}
+
+.create-ticket-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page-breadcrumb {
+  margin-bottom: 1.5rem;
+}
+
+.page-breadcrumb button {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0;
+  transition: color 0.2s;
+}
+
+.page-breadcrumb button:hover {
+  color: #0ea5e9;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.page-header p {
+  margin: 0.5rem 0 0;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+/* Success/Error message area (for when you add toast later) */
+.page-message {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.625rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+.page-message.success {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.page-message.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .create-ticket-page {
+    padding: 1rem 0.75rem 3rem;
+  }
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+}
