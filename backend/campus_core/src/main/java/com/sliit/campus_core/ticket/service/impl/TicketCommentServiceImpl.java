@@ -55,7 +55,7 @@ public class TicketCommentServiceImpl implements TicketCommentService {
 
         NotificationRequestDTO req = new NotificationRequestDTO();
         req.setRecipientUserId(ticket.getReportedById());
-        req.setType("COMMENT_ADDED");
+        req.setType("COMMENT");
         req.setTitle("New Comment");
         req.setMessage(comment.getContent());
         req.setReferenceId(comment.getId());
@@ -93,7 +93,7 @@ public class TicketCommentServiceImpl implements TicketCommentService {
 
         NotificationRequestDTO req = new NotificationRequestDTO();
         req.setRecipientUserId(comment.getAuthorId());
-        req.setType("COMMENT_UPDATED");
+        req.setType("COMMENT");
         req.setTitle("Comment Updated");
         req.setMessage(comment.getContent());
         req.setReferenceId(comment.getId());
@@ -120,7 +120,7 @@ public class TicketCommentServiceImpl implements TicketCommentService {
 
         NotificationRequestDTO req = new NotificationRequestDTO();
         req.setRecipientUserId(comment.getAuthorId());
-        req.setType("COMMENT_DELETED");
+        req.setType("COMMENT");
         req.setTitle("Comment Deleted");
         req.setMessage("[deleted]");
         req.setReferenceId(comment.getId());

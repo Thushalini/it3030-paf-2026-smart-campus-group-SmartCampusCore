@@ -98,7 +98,7 @@ public class TicketServiceImpl implements TicketService {
 
         NotificationRequestDTO req = new NotificationRequestDTO();
         req.setRecipientUserId(reportedById);
-        req.setType("TICKET_CREATED");
+        req.setType("TICKET");
         req.setTitle("New Ticket Created");
         req.setMessage(ticket.getTitle());
         req.setReferenceId(ticket.getId());
@@ -217,7 +217,7 @@ public class TicketServiceImpl implements TicketService {
 
         NotificationRequestDTO req = new NotificationRequestDTO();
         req.setRecipientUserId(ticket.getReportedById());
-        req.setType("TICKET_STATUS_CHANGED");
+        req.setType("TICKET");
         req.setTitle("Status Updated");
         req.setMessage("Ticket status changed to " + ticket.getStatus());
         req.setReferenceId(ticket.getId());
@@ -263,7 +263,7 @@ public class TicketServiceImpl implements TicketService {
 
         NotificationRequestDTO req = new NotificationRequestDTO();
         req.setRecipientUserId(dto.getTechnicianId());
-        req.setType("TICKET_ASSIGNED");
+        req.setType("TICKET");
         req.setTitle("Technician Assigned");
         req.setMessage("Assigned to " + dto.getTechnicianName());
         req.setReferenceId(ticket.getId());

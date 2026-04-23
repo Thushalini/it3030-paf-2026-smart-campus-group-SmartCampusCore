@@ -161,6 +161,7 @@ export default function AdminTicketManagementPage() {
                 <th>Category</th>
                 <th>Priority</th>
                 <th>Status</th>
+                <th>SLA</th>
                 <th>Reported By</th>
                 <th>Assigned To</th>
                 <th>Created</th>
@@ -170,7 +171,7 @@ export default function AdminTicketManagementPage() {
             <tbody>
               {tickets.length === 0 ? (
                 <tr>
-                  <td colSpan="9" className="no-data">
+                  <td colSpan="10" className="no-data">
                     No tickets found
                   </td>
                 </tr>
@@ -189,6 +190,15 @@ export default function AdminTicketManagementPage() {
                       <span className={`badge status-${getStatusColor(t.status)}`}>
                         {getStatusLabel(t.status)}
                       </span>
+                    </td>
+                    <td>
+                      {t.slaBreached === true ? (
+                        <span className="badge sla-breached">Breached</span>
+                      ) : t.slaBreached === false ? (
+                        <span className="badge sla-ok">Met</span>
+                      ) : (
+                        <span className="badge sla-pending">Pending</span>
+                      )}
                     </td>
                     <td>{t.reportedByName}</td>
                     <td>{t.assignedToName || "—"}</td>

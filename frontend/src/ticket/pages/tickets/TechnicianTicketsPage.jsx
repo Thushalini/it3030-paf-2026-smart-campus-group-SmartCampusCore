@@ -67,6 +67,7 @@ export default function TechnicianTicketPage() {
                 <th>Category</th>
                 <th>Priority</th>
                 <th>Status</th>
+                <th>SLA</th>
                 <th>Location</th>
                 <th>Created</th>
                 <th>Actions</th>
@@ -75,7 +76,7 @@ export default function TechnicianTicketPage() {
             <tbody>
               {tickets.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="no-data">
+                  <td colSpan="9" className="no-data">
                     No assigned tickets
                   </td>
                 </tr>
@@ -94,6 +95,15 @@ export default function TechnicianTicketPage() {
                       <span className={`badge status-${getStatusColor(t.status)}`}>
                         {getStatusLabel(t.status)}
                       </span>
+                    </td>
+                    <td>
+                      {t.slaBreached === true ? (
+                        <span className="badge sla-breached">Breached</span>
+                      ) : t.slaBreached === false ? (
+                        <span className="badge sla-ok">Met</span>
+                      ) : (
+                        <span className="badge sla-pending">Pending</span>
+                      )}
                     </td>
                     <td>{t.location}</td>
                     <td>{new Date(t.createdAt).toLocaleDateString()}</td>

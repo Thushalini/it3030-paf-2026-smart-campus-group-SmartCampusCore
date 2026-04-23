@@ -273,6 +273,22 @@
 .status-gray   { background: #f1f5f9; color: #475569; }
 .status-red    { background: #fee2e2; color: #991b1b; }
 
+/* SLA badges */
+.sla-breached {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.sla-ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.sla-pending {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
 /* ─── Loading & Error ─── */
 .loading {
   text-align: center;
