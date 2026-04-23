@@ -16,7 +16,6 @@ import com.sliit.campus_core.ticket.service.TicketService;
 import com.sliit.campus_core.entity.User;
 import com.sliit.campus_core.repository.UserRepository;
 import jakarta.validation.Valid;
-import com.sliit.campus_core.entity.User;
 import com.sliit.campus_core.entity.Role;  // adjust package if different
 import java.util.stream.Collectors;
 
@@ -168,7 +167,9 @@ public class TicketController {
             @AuthenticationPrincipal String email) {
 
         User currentUser = getUserByEmail(email);
-        TicketResponseDTO response = ticketService.assignTechnician(id, dto, currentUser.getId());
+        // CHANGE: Pass name and role so service can log history on auto-transition
+        TicketResponseDTO response = ticketService.assignTechnician(
+                id, dto, currentUser.getId(), currentUser.getName(), currentUser.getRole().name());
         return ResponseEntity.ok(ApiResponse.success("Technician assigned successfully", response));
     }
 
