@@ -1,5 +1,9 @@
 package com.sliit.campus_core.ticket.exception;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,12 +13,8 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class TicketGlobalExceptionHandler {
 
         @ExceptionHandler(TicketNotFoundException.class)
         public ResponseEntity<ErrorResponseDTO> handleTicketNotFound(TicketNotFoundException ex) {

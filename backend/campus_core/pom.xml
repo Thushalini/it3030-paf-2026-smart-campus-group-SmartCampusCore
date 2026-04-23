@@ -120,13 +120,6 @@
 			<version>3.0.2</version>
 		</dependency>
 
-		<!-- Hibernate Validator (implementation of Jakarta Validation) -->
-		<dependency>
-			<groupId>org.hibernate.validator</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>7.0.5.Final</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
