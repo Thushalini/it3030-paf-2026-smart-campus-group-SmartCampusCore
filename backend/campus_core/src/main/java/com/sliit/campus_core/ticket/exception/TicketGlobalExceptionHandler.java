@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class TicketGlobalExceptionHandler {
 
         @ExceptionHandler(TicketNotFoundException.class)
         public ResponseEntity<ErrorResponseDTO> handleTicketNotFound(TicketNotFoundException ex) {

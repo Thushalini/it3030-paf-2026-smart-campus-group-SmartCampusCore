@@ -62,8 +62,6 @@ public class TicketCommentServiceImpl implements TicketCommentService {
         req.setReferenceType("COMMENT");
         notificationPublisher.publishCommentAdded(req);
 
-        // TODO: replace with publishCommentAdded when Member 4 defines NotificationService
-
         return toResponse(saved, authorId, authorRole);
     }
 
@@ -102,8 +100,6 @@ public class TicketCommentServiceImpl implements TicketCommentService {
         req.setReferenceType("COMMENT");
         notificationPublisher.publishCommentUpdated(req);
 
-        // TODO: publishCommentUpdated when Member 4 defines NotificationService
-
         return toResponse(updated, currentUserId, null);
     }
 
@@ -130,9 +126,6 @@ public class TicketCommentServiceImpl implements TicketCommentService {
         req.setReferenceId(comment.getId());
         req.setReferenceType("COMMENT");
         notificationPublisher.publishCommentDeleted(req);
-
-        // TODO: publishCommentDeleted when Member 4 defines NotificationService
-
     }
 
     private CommentResponseDTO toResponse(TicketComment comment, String currentUserId, String currentRole) {
@@ -151,4 +144,3 @@ public class TicketCommentServiceImpl implements TicketCommentService {
         return dto;
     }
 }
-

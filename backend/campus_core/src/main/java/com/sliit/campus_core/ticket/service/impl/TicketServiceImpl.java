@@ -118,7 +118,6 @@ public class TicketServiceImpl implements TicketService {
             ticket.setImageAttachments(new ArrayList<>());
         }
 
-        // enforce max 3
         if (ticket.getImageAttachments().size() + urls.size() > 3) {
             throw new MaxAttachmentsExceededException("Cannot upload more than 3 images");
         }
@@ -137,7 +136,6 @@ public class TicketServiceImpl implements TicketService {
         Optional<Ticket> ticketOpt = ticketRepository.findById(ticketId);
         Ticket ticket = ticketOpt.orElseThrow(() -> new TicketNotFoundException(ticketId));
 
-        // Basic role check (expand later)
         if ("USER".equalsIgnoreCase(currentRole) &&
             !ticket.getReportedById().equals(currentUserId)) {
             throw new RuntimeException("Unauthorized access to ticket");
@@ -150,7 +148,6 @@ public class TicketServiceImpl implements TicketService {
     public Page<TicketResponseDTO> getMyTickets(TicketFilterRequestDTO filter, Pageable pageable) {
         Page<Ticket> page = ticketRepository.findByReportedByIdOrderByCreatedAtDesc(filter.getReportedById(), pageable);
 
-        // Apply filters manually (simplified for now)
         List<TicketResponseDTO> filtered = page.stream()
             .filter(t -> filter.getStatus() == null || t.getStatus() == filter.getStatus())
             .filter(t -> filter.getPriority() == null || t.getPriority() == filter.getPriority())
@@ -158,7 +155,7 @@ public class TicketServiceImpl implements TicketService {
             .filter(t -> filter.getResourceId() == null || t.getResourceId().equals(filter.getResourceId()))
             .filter(t -> filter.getSearch() == null 
                 || t.getTitle().toLowerCase().contains(filter.getSearch().toLowerCase()) 
-                || t.getDescription().toLowerCase().contains(filter.getSearch().toLowerCase())) // ✅ search filter
+                || t.getDescription().toLowerCase().contains(filter.getSearch().toLowerCase()))
             .map(ticketMapper::toResponseDTO)
             .toList();
 
@@ -171,27 +168,22 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
-        // Validate transition
         if (!TicketStatus.getAllowedTransitions(ticket.getStatus()).contains(dto.getNewStatus())) {
             throw new InvalidStatusTransitionException("Cannot transition from " + ticket.getStatus() + " to " + dto.getNewStatus());
         }
 
-        // Apply new status first so transition-specific logic knows the target state
         ticket.setStatus(dto.getNewStatus());
         ticket.setUpdatedAt(Instant.now());
 
-        // Handle transitions
         if (dto.getNewStatus() == TicketStatus.IN_PROGRESS && ticket.getFirstResponseAt() == null) {
             LocalDateTime now = LocalDateTime.now();
             ticket.setFirstResponseAt(now);
-            // Calculate minutes between creation and first response
             long minutes = Duration.between(ticket.getCreatedAt(), now.atZone(ZoneId.systemDefault()).toInstant()).toMinutes();
             ticket.setFirstResponseTimeMinutes(minutes);
         }
         if (dto.getNewStatus() == TicketStatus.RESOLVED) {
             LocalDateTime resolvedAt = LocalDateTime.now();
             ticket.setResolvedAt(resolvedAt);
-            // Calculate minutes between creation and resolution
             long minutes = Duration.between(ticket.getCreatedAt(), resolvedAt.atZone(ZoneId.systemDefault()).toInstant()).toMinutes();
             ticket.setResolutionTimeMinutes(minutes);
             ticket.setResolutionNote(dto.getResolutionNote());
@@ -208,7 +200,6 @@ public class TicketServiceImpl implements TicketService {
 
         Ticket savedTicket = ticketRepository.save(ticket);
 
-        // Save status history using builder
         TicketStatusHistory history = TicketStatusHistory.builder()
                 .ticketId(ticketId)
                 .fromStatus(ticket.getStatus().name())
@@ -264,12 +255,9 @@ public class TicketServiceImpl implements TicketService {
                                                 String currentUserId,
                                                 String currentRole,
                                                 Pageable pageable) {
-        // TODO: integrate with Member 4’s JWT claims for real userId/role
         if ("TECHNICIAN".equalsIgnoreCase(currentRole)) {
             filter.setAssignedToId(currentUserId);
         }
-
-        // Build dynamic query (simplified for now)
         return ticketRepository.findAll(pageable)
                 .map(this::toResponseDTO);
     }
@@ -279,7 +267,6 @@ public class TicketServiceImpl implements TicketService {
         TicketAnalyticsDTO dto = new TicketAnalyticsDTO();
         dto.setTotalTickets(ticketRepository.count());
 
-        // Basic counts
         dto.setByStatus(Map.of(
                 "OPEN", ticketRepository.countByStatus(TicketStatus.OPEN),
                 "IN_PROGRESS", ticketRepository.countByStatus(TicketStatus.IN_PROGRESS),
@@ -304,14 +291,12 @@ public class TicketServiceImpl implements TicketService {
             "OTHER", ticketRepository.countByCategory(TicketCategory.OTHER)
         ));
 
-
-
-        // TODO: compute averages with Mongo aggregation
+        // TODO: implement average calculations with MongoDB aggregation
         dto.setAvgFirstResponseMinutes(0.0);
         dto.setAvgResolutionMinutes(0.0);
         dto.setSlaBreachRate(0.0);
 
-        // TODO: integrate with Member 1’s resource API for topReportedResources
+        // TODO: integrate with Member 1’s resource API for top reported resources
         dto.setTopReportedResources(List.of());
 
         return dto;
@@ -322,7 +307,6 @@ public class TicketServiceImpl implements TicketService {
                                                         String currentUserId,
                                                         String currentRole,
                                                         Pageable pageable) {
-        // TODO: confirm with Member 1 whether they poll this endpoint or you push updates
         return ticketRepository.findByResourceId(resourceId, pageable)
                 .map(ticketMapper::toResponseDTO);
     }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import ticketApi from "../../api/ticketApi";   // <-- ADD THIS IMPORT
 import "./AssignTechnicianModal.css";
 
 /**
@@ -8,10 +8,6 @@ import "./AssignTechnicianModal.css";
  * - currentAssignee (string|null) – technician name or null
  * - onAssign (function) – called with { technicianId, technicianName }
  * - onClose (function)
- * 
- * TODO (Integration with Member 4):
- * - Replace mock data with real endpoint /api/v1/users?role=TECHNICIAN
- * - Add authentication headers once JWT is ready.
  */
 export default function AssignTechnicianModal({ ticketId, currentAssignee, onAssign, onClose }) {
   const [technicians, setTechnicians] = useState([]);
@@ -19,7 +15,7 @@ export default function AssignTechnicianModal({ ticketId, currentAssignee, onAss
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Temporary mock data for testing (remove when Member 4's API is ready)
+  // Temporary mock data for fallback
   const MOCK_TECHNICIANS = [
     { id: "tech1", fullName: "John Doe", email: "john.doe@example.com" },
     { id: "tech2", fullName: "Jane Smith", email: "jane.smith@example.com" },
@@ -31,21 +27,9 @@ export default function AssignTechnicianModal({ ticketId, currentAssignee, onAss
       setLoading(true);
       setError(null);
       try {
-        // TODO: Replace with real endpoint from Member 4
-        const response = await axios.get("/api/v1/users?role=TECHNICIAN");
-        
-        // Extract technicians array from response – handle different structures
-        let techsArray = [];
-        if (response.data?.data && Array.isArray(response.data.data)) {
-          techsArray = response.data.data;
-        } else if (Array.isArray(response.data)) {
-          techsArray = response.data;
-        } else {
-          // If response is not as expected, fallback to mock (or empty)
-          console.warn("Unexpected API response, using mock technicians:", response.data);
-          techsArray = MOCK_TECHNICIANS;
-        }
-        
+        // Use your ticketApi instance (attaches JWT token automatically)
+        const response = await ticketApi.get("/tickets/technicians");
+        const techsArray = response.data?.data || [];
         setTechnicians(techsArray);
         
         // Pre-select current assignee if found
