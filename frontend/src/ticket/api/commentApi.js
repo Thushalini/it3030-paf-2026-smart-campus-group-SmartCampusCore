@@ -1,16 +1,23 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api/v1";
 
-export const getComments = (ticketId) =>
-  axios.get(`${API_BASE}/tickets/${ticketId}/comments`);
+const commentApi = axios.create({ baseURL: API_BASE });
 
-export const addComment = (ticketId, content) =>
-  axios.post(`${API_BASE}/tickets/${ticketId}/comments`, { content });
+commentApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token") 
+             || localStorage.getItem("jwt") 
+             || localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => Promise.reject(error));
 
-export const updateComment = (ticketId, commentId, content) =>
-  axios.put(`${API_BASE}/tickets/${ticketId}/comments/${commentId}`, { content });
+export const getComments = (ticketId) => commentApi.get(`/tickets/${ticketId}/comments`);
 
-export const deleteComment = (ticketId, commentId) =>
-  axios.delete(`${API_BASE}/tickets/${ticketId}/comments/${commentId}`);
-// TODO: backend will enforce ownership via JWT claims later
+export const addComment = (ticketId, content) => commentApi.post(`/tickets/${ticketId}/comments`, { content });
+
+export const updateComment = (ticketId, commentId, content) => commentApi.put(`/tickets/${ticketId}/comments/${commentId}`, { content });
+
+export const deleteComment = (ticketId, commentId) => commentApi.delete(`/tickets/${ticketId}/comments/${commentId}`);

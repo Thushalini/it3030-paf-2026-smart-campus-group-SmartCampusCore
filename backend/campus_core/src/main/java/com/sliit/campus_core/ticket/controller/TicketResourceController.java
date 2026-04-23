@@ -1,21 +1,14 @@
 package com.sliit.campus_core.ticket.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.sliit.campus_core.dto.ApiResponse;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.sliit.campus_core.dto.ApiResponse;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/resources")

@@ -1,23 +1,34 @@
 package com.sliit.campus_core.ticket.controller;
 
-import com.sliit.campus_core.dto.ApiResponse;
-import com.sliit.campus_core.dto.comment.CommentCreateRequestDTO;
-import com.sliit.campus_core.dto.comment.CommentUpdateRequestDTO;
-import com.sliit.campus_core.dto.comment.CommentResponseDTO;
-import com.sliit.campus_core.ticket.service.TicketCommentService;
-import jakarta.validation.Valid;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.sliit.campus_core.dto.ApiResponse;
+import com.sliit.campus_core.dto.comment.CommentCreateRequestDTO;
+import com.sliit.campus_core.dto.comment.CommentResponseDTO;
+import com.sliit.campus_core.dto.comment.CommentUpdateRequestDTO;
+import com.sliit.campus_core.entity.User;
+import com.sliit.campus_core.repository.UserRepository;
+import com.sliit.campus_core.ticket.service.TicketCommentService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/tickets/{ticketId}/comments")
 public class TicketCommentController {
+
     private final TicketCommentService commentService;
 
     @Autowired
@@ -25,14 +36,26 @@ public class TicketCommentController {
         this.commentService = commentService;
     }
 
+    @Autowired
+    private UserRepository userRepository;
+
+    private User getUserByEmail(String email) {
+        if (email == null) {
+            throw new RuntimeException("No authenticated user found");
+        }
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<CommentResponseDTO>> addComment(
             @PathVariable String ticketId,
             @Valid @RequestBody CommentCreateRequestDTO dto,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal String email) {
 
+        User currentUser = getUserByEmail(email);
         CommentResponseDTO response = commentService.addComment(ticketId, dto,
-                "user123", "Test User", "USER");
+                currentUser.getId(), currentUser.getName(), currentUser.getRole().name());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Comment added successfully", response));
     }
@@ -40,9 +63,10 @@ public class TicketCommentController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<CommentResponseDTO>>> getComments(
             @PathVariable String ticketId,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal String email) {
 
-        List<CommentResponseDTO> comments = commentService.getCommentsByTicket(ticketId, "user123");
+        User currentUser = getUserByEmail(email);
+        List<CommentResponseDTO> comments = commentService.getCommentsByTicket(ticketId, currentUser.getId());
         return ResponseEntity.ok(ApiResponse.success("Comments fetched successfully", comments));
     }
 
@@ -51,9 +75,10 @@ public class TicketCommentController {
             @PathVariable String ticketId,
             @PathVariable String commentId,
             @Valid @RequestBody CommentUpdateRequestDTO dto,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal String email) {
 
-        CommentResponseDTO response = commentService.updateComment(ticketId, commentId, dto, "user123");
+        User currentUser = getUserByEmail(email);
+        CommentResponseDTO response = commentService.updateComment(ticketId, commentId, dto, currentUser.getId());
         return ResponseEntity.ok(ApiResponse.success("Comment updated successfully", response));
     }
 
@@ -61,9 +86,10 @@ public class TicketCommentController {
     public ResponseEntity<Void> deleteComment(
             @PathVariable String ticketId,
             @PathVariable String commentId,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal String email) {
 
-        commentService.deleteComment(ticketId, commentId, "user123", "USER");
+        User currentUser = getUserByEmail(email);
+        commentService.deleteComment(ticketId, commentId, currentUser.getId(), currentUser.getRole().name());
         return ResponseEntity.noContent().build();
-    }    
+    }
 }

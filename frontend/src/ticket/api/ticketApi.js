@@ -1,16 +1,26 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api/v1";
 
-export const createTicket = (ticketData) =>
-  axios.post(`${API_BASE}/tickets`, ticketData, {
-    headers: { "Content-Type": "application/json" }
-  });
+const ticketApi = axios.create({ baseURL: API_BASE });
+
+// Auto-attach JWT token from localStorage (set by Member 4's OAuth login)
+ticketApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token") 
+             || localStorage.getItem("jwt") 
+             || localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => Promise.reject(error));
+
+export const createTicket = (ticketData) => ticketApi.post(`/tickets`, ticketData);
 
 export const uploadAttachments = (ticketId, files) => {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
-  return axios.post(`${API_BASE}/tickets/${ticketId}/attachments`, formData, {
+  return ticketApi.post(`/tickets/${ticketId}/attachments`, formData, {
     headers: { "Content-Type": "multipart/form-data" }
   });
 };
@@ -22,19 +32,16 @@ export const getMyTickets = (filters = {}) => {
       params.append(key, value);
     }
   });
-  return axios.get(`${API_BASE}/tickets/my?${params.toString()}`);
+  return ticketApi.get(`/tickets/my?${params.toString()}`);
 };
 
-export const getTicketById = (ticketId) =>
-  axios.get(`${API_BASE}/tickets/${ticketId}`);
+export const getTicketById = (ticketId) => ticketApi.get(`/tickets/${ticketId}`);
 
-export const updateTicketStatus = (ticketId, data) =>
-  axios.patch(`${API_BASE}/tickets/${ticketId}/status`, data);
+export const updateTicketStatus = (ticketId, data) => ticketApi.patch(`/tickets/${ticketId}/status`, data);
 
-export const assignTechnician = (ticketId, data) =>
-  axios.patch(`${API_BASE}/tickets/${ticketId}/assign`, data);
+export const assignTechnician = (ticketId, data) => ticketApi.patch(`/tickets/${ticketId}/assign`, data);
 
-// Chunk 11
+// Chunk 11 exports
 export const getAllTickets = (filters = {}) => {
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
@@ -42,15 +49,11 @@ export const getAllTickets = (filters = {}) => {
       params.append(key, value);
     }
   });
-  return axios.get(`${API_BASE}/tickets?${params.toString()}`);
+  return ticketApi.get(`/tickets?${params.toString()}`);
 };
 
-export const getTicketAnalytics = () =>
-  axios.get(`${API_BASE}/tickets/analytics`);
+export const getTicketAnalytics = () => ticketApi.get(`/tickets/analytics`);
 
-export const getTicketsByResource = (resourceId) =>
-  axios.get(`${API_BASE}/tickets/resource/${resourceId}`);
+export const getTicketsByResource = (resourceId) => ticketApi.get(`/tickets/resource/${resourceId}`);
 
-// TODO (Integration with Member 4): 
-// - Add axios interceptor to include JWT token in Authorization header once auth is ready.
-// - Replace VITE_API_BASE_URL with actual backend URL from environment.
+export default ticketApi;

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import ticketApi from "../../api/ticketApi";   // <-- ADD THIS IMPORT
 import "./AssignTechnicianModal.css";
 
 /**
@@ -8,11 +8,6 @@ import "./AssignTechnicianModal.css";
  * - currentAssignee (string|null) – technician name or null
  * - onAssign (function) – called with { technicianId, technicianName }
  * - onClose (function)
- * 
- * TODO (Integration with Member 4):
- * - Replace /api/v1/users?role=TECHNICIAN with the actual endpoint provided by Member 4.
- * - The endpoint should return an array of users with fields: id, fullName, email.
- * - Add authentication headers (JWT) once auth is ready.
  */
 export default function AssignTechnicianModal({ ticketId, currentAssignee, onAssign, onClose }) {
   const [technicians, setTechnicians] = useState([]);
@@ -20,25 +15,38 @@ export default function AssignTechnicianModal({ ticketId, currentAssignee, onAss
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Temporary mock data for fallback
+  const MOCK_TECHNICIANS = [
+    { id: "tech1", fullName: "John Doe", email: "john.doe@example.com" },
+    { id: "tech2", fullName: "Jane Smith", email: "jane.smith@example.com" },
+    { id: "tech3", fullName: "Bob Johnson", email: "bob.johnson@example.com" },
+  ];
+
   useEffect(() => {
     const fetchTechnicians = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        // TODO: Replace URL with Member 4's endpoint
-        const response = await axios.get("/api/v1/users?role=TECHNICIAN");
-        const techs = response.data?.data || response.data || [];
-        setTechnicians(techs);
-        // Pre-select current assignee if any
+        // Use your ticketApi instance (attaches JWT token automatically)
+        const response = await ticketApi.get("/tickets/technicians");
+        const techsArray = response.data?.data || [];
+        setTechnicians(techsArray);
+        
+        // Pre-select current assignee if found
         if (currentAssignee) {
-          const current = techs.find(t => t.fullName === currentAssignee);
+          const current = techsArray.find(t => t.fullName === currentAssignee);
           if (current) setSelectedTechId(current.id);
         }
       } catch (err) {
-        setError("Failed to load technician list");
-        console.error(err);
+        console.error("Failed to fetch technicians:", err);
+        // Fallback to mock data for development
+        setTechnicians(MOCK_TECHNICIANS);
+        setError("Could not load technicians from server. Using demo list.");
       } finally {
         setLoading(false);
       }
     };
+    
     fetchTechnicians();
   }, [currentAssignee]);
 
@@ -58,7 +66,10 @@ export default function AssignTechnicianModal({ ticketId, currentAssignee, onAss
         <h3>Assign Technician</h3>
         {loading && <p>Loading technicians...</p>}
         {error && <p className="error">{error}</p>}
-        {!loading && !error && (
+        {!loading && technicians.length === 0 && !error && (
+          <p>No technicians available.</p>
+        )}
+        {!loading && technicians.length > 0 && (
           <form onSubmit={handleSubmit}>
             <select
               value={selectedTechId}
