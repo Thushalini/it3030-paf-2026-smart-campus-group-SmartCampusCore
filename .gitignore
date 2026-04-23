@@ -12,3 +12,22 @@
 
 # OS
 .DS_Store
+
+# Maven wrapper
+/backend/.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot build
+/backend/campus_core/target/
+
+/backend/campus_core/src/main/resources/application-secrets.properties
+
+# Frontend environment
+/frontend/.env
+
+# Java/Maven artifacts
+*.class
+*.iml
+*.swp
+
+# Windows OS junk
+Thumbs.db

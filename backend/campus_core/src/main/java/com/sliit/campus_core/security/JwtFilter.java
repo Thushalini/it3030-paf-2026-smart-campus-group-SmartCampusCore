@@ -30,6 +30,12 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
 
         String path = request.getRequestURI();
+        String method = request.getMethod();   // <-- Ticket: ADD THIS
+
+        // Ticket:Skip OPTIONS requests entirely (no JWT needed for preflight)
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
 
         return path.equals("/api/auth/login")
             || path.equals("/api/auth/signup")
@@ -37,7 +43,10 @@ public class JwtFilter extends OncePerRequestFilter {
             || path.startsWith("/oauth2")
             || path.startsWith("/favicon.ico")
             || path.startsWith("/static/")
-            || path.startsWith("/assets/");
+            || path.startsWith("/assets/")
+            || path.startsWith("/api/v1/resources/")   // ← Ticket: resource dropdown
+            || path.startsWith("/uploads/")             // ← Ticket: ticket images
+            || path.startsWith("/api/files/");          // ← Tocket: file downloads
     }
 
     @Override

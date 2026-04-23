@@ -7,7 +7,6 @@ const Sidebar = () => {
   const location = useLocation();
   const role = user?.role;
 
-  // ✅ Define linkStyle function
   const linkStyle = (path) => ({
     color: "white",
     display: "block",
@@ -33,10 +32,10 @@ const Sidebar = () => {
         {role === "USER" && (
           <>
             <li><Link to="/user" style={linkStyle("/user")}>👤 My Profile</Link></li>
-            {/* ✅ Fixed: was /resources, must be /user/resources */}
             <li><Link to="/user/resources" style={linkStyle("/user/resources")}>📦 Resources</Link></li>
             <li><Link to="/bookings" style={linkStyle("/bookings")}>📅 My Bookings</Link></li>
-            <li><Link to="/tickets" style={linkStyle("/tickets")}>🎫 My Tickets</Link></li>
+            <li><Link to="/tickets/my" style={linkStyle("/tickets/my")}>🎫 My Tickets</Link></li>
+            <li><Link to="/tickets/create" style={linkStyle("/tickets/create")}>➕ Raise Ticket</Link></li>
           </>
         )}
 
@@ -44,6 +43,7 @@ const Sidebar = () => {
         {role === "TECHNICIAN" && (
           <>
             <li><Link to="/technician" style={linkStyle("/technician")}>👤 Profile</Link></li>
+            <li><Link to="/technician/tickets" style={linkStyle("/technician/tickets")}>🔧 My Assignments</Link></li>
           </>
         )}
 
@@ -67,6 +67,12 @@ const Sidebar = () => {
             <li><Link to="/admin/resources" style={linkStyle("/admin/resources")}>🗂️ Manage Resources</Link></li>
             <li><Link to="/admin/resources/new" style={linkStyle("/admin/resources/new")}>➕ Add New Resource</Link></li>
             <li><Link to="/admin/resources/analytics" style={linkStyle("/admin/resources/analytics")}>📊 Analytics</Link></li>
+
+            {/* Tickets Section */}
+            <li style={{ marginTop: "12px", fontSize: "11px", color: "#93c5fd", textTransform: "uppercase", padding: "0 12px" }}>
+              Tickets
+            </li>
+            <li><Link to="/admin/tickets" style={linkStyle("/admin/tickets")}>🎫 Manage Tickets</Link></li>
           </>
         )}
 
