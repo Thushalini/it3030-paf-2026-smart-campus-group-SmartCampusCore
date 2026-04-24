@@ -6,8 +6,7 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,8 +37,9 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<BookingResponse> createBooking(
             @Valid @RequestBody BookingRequest request,
-            @AuthenticationPrincipal String userEmail) {
+            Authentication authentication) {
         
+        String userEmail = authentication.getName();
         BookingResponse response = bookingService.createBooking(request, userEmail);
         
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -47,8 +47,9 @@ public class BookingController {
     
     @GetMapping("/my")
     public ResponseEntity<List<BookingResponse>> getMyBookings(
-            @AuthenticationPrincipal String userEmail) {
+            Authentication authentication) {
         
+        String userEmail = authentication.getName();
         List<BookingResponse> bookings = bookingService.getMyBookings(userEmail);
         
         return ResponseEntity.ok(bookings);
@@ -83,8 +84,9 @@ public class BookingController {
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<BookingResponse> cancelBooking(
             @PathVariable String id,
-            @AuthenticationPrincipal String userEmail) {
+            Authentication authentication) {
         
+        String userEmail = authentication.getName();
         BookingResponse response = bookingService.cancelBooking(id, userEmail);
         return ResponseEntity.ok(response);
     }

@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { bookingAPI } from '../services/api';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Clock, 
-  Calendar, 
-  MapPin, 
-  Users, 
-  FileText, 
-  X, 
-  Check, 
+import {
+  Clock,
+  Calendar,
+  Users,
+  FileText,
+  X,
+  Check,
   XCircle,
-  QrCode,
-  Eye
+  QrCode
 } from 'lucide-react';
 
 const MyBookingsPage = () => {
@@ -30,6 +27,7 @@ const MyBookingsPage = () => {
   const fetchMyBookings = async () => {
     try {
       const response = await bookingAPI.getMyBookings();
+      console.log('MY BOOKINGS RESPONSE:', response.data);
       setBookings(response.data);
     } catch (error) {
       toast.error('Failed to fetch bookings');
@@ -54,8 +52,18 @@ const MyBookingsPage = () => {
   };
 
   const handleShowQRCode = (qrCodeBase64) => {
+    if (!qrCodeBase64) {
+      toast.error('QR code not available for this booking');
+      return;
+    }
+
     setSelectedQRCode(qrCodeBase64);
     setShowQRModal(true);
+  };
+
+  const handleCloseQRModal = () => {
+    setShowQRModal(false);
+    setSelectedQRCode('');
   };
 
   const getStatusBadge = (status) => {
@@ -133,12 +141,12 @@ const MyBookingsPage = () => {
             You haven't made any booking requests yet.
           </p>
           <div className="mt-6">
-            <Link
-              to="/user/bookings/new"
+            <a
+              href="/user/book-resource"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
             >
               Create Booking
-            </Link>
+            </a>
           </div>
         </div>
       ) : (
@@ -162,7 +170,7 @@ const MyBookingsPage = () => {
                           {getStatusBadge(booking.status)}
                         </div>
                       </div>
-                      
+
                       <div className="mt-2 sm:flex sm:justify-between">
                         <div className="sm:flex">
                           <p className="flex items-center text-sm text-gray-500">
@@ -178,6 +186,7 @@ const MyBookingsPage = () => {
                             {booking.attendeesCount} attendees
                           </p>
                         </div>
+
                         <div className="mt-2 flex items-center space-x-2 sm:mt-0">
                           {booking.status === 'APPROVED' && (
                             <>
@@ -199,7 +208,7 @@ const MyBookingsPage = () => {
                           )}
                         </div>
                       </div>
-                      
+
                       {booking.purpose && (
                         <div className="mt-2">
                           <p className="flex items-start text-sm text-gray-500">
@@ -208,7 +217,7 @@ const MyBookingsPage = () => {
                           </p>
                         </div>
                       )}
-                      
+
                       {booking.rejectionReason && (
                         <div className="mt-2">
                           <p className="text-sm text-red-600">
@@ -225,45 +234,42 @@ const MyBookingsPage = () => {
         </div>
       )}
 
-      {/* QR Code Modal */}
       {showQRModal && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-            
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="w-full">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                      Booking QR Code
-                    </h3>
-                    
-                    {selectedQRCode ? (
-                      <div className="text-center">
-                        <img 
-                          src={`data:image/png;base64,${selectedQRCode}`}
-                          alt="Booking QR Code"
-                          className="mx-auto mb-4"
-                        />
-                        <p className="text-sm text-gray-600">
-                          Show this QR code at the resource location for verification.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="text-center text-gray-500">
-                        <QrCode className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-                        <p>QR code not available</p>
-                      </div>
-                    )}
-                  </div>
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center px-4">
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50"
+              onClick={handleCloseQRModal}
+            />
+
+            <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Booking QR Code
+              </h3>
+
+              {selectedQRCode ? (
+                <div className="text-center">
+                  <img
+                    src={`data:image/png;base64,${selectedQRCode}`}
+                    alt="Booking QR Code"
+                    className="mx-auto mb-4 w-64 h-64 object-contain border rounded"
+                  />
+                  <p className="text-sm text-gray-600">
+                    Show this QR code at the resource location for verification.
+                  </p>
                 </div>
-              </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              ) : (
+                <div className="text-center text-gray-500">
+                  <QrCode className="mx-auto h-12 w-12 text-gray-400 mb-2" />
+                  <p>QR code not available</p>
+                </div>
+              )}
+
+              <div className="mt-6 flex justify-end">
                 <button
                   type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => setShowQRModal(false)}
+                  className="inline-flex justify-center rounded-md px-4 py-2 bg-primary-600 text-white hover:bg-primary-700"
+                  onClick={handleCloseQRModal}
                 >
                   Close
                 </button>

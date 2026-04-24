@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -13,10 +15,12 @@ public class Booking {
     @Id
     private String id;
     
-    @DBRef
+    @DBRef(lazy = false)
+    @Field("resource")
     private Resource resource;
     
-    @DBRef
+    @DBRef(lazy = false)
+    @Field("user")
     private User user;
     
     private LocalDate date;
@@ -41,9 +45,11 @@ public class Booking {
     private byte[] qrCode;
     
     @Field("created_at")
+    @CreatedDate
     private LocalDateTime createdAt;
     
     @Field("updated_at")
+    @LastModifiedDate
     private LocalDateTime updatedAt;
     
     

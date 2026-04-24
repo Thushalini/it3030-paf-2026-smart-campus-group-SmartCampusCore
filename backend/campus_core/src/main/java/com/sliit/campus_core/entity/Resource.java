@@ -1,6 +1,7 @@
 package com.sliit.campus_core.entity;
 
 import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,9 @@ public class Resource {
     private ResourceStatus status;
     private List<String> features;
     private List<String> imageUrls;
+
+    private LocalTime startTime;
+    private LocalTime endTime;
 
     @Field("imageUrl")
     private String legacyImageUrl;
@@ -127,6 +131,22 @@ public class Resource {
 
     public void setAvailabilityWindow(String availabilityWindow) {
         this.availabilityWindow = availabilityWindow;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 
     public ResourceStatus getStatus() {

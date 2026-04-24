@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -16,7 +17,7 @@ public class BookingRequest {
     private String resourceId;
     
     @NotNull(message = "Date is required")
-    @Future(message = "Date must be in the future")
+    @FutureOrPresent(message = "Date must be today or in the future")
     private LocalDate date;
     
     @NotNull(message = "Start time is required")

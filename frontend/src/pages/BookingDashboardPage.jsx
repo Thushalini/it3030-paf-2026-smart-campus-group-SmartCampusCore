@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { bookingAPI, resourceAPI } from '../services/api';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '../context/AuthContext';
-import { 
-  Clock, 
-  Calendar, 
-  MapPin, 
-  Users, 
-  FileText, 
-  Check, 
+import {
+  Clock,
+  Calendar,
+  Users,
+  FileText,
+  Check,
   XCircle,
   Filter,
   Search,
   X
 } from 'lucide-react';
 
-const AdminDashboardPage = () => {
-  const { user } = useAuth();
+const BookingDashboardPage = () => {
   const [bookings, setBookings] = useState([]);
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submittingReject, setSubmittingReject] = useState(false);
+
   const [filters, setFilters] = useState({
     status: '',
     date: '',
     resourceId: ''
   });
+
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -32,20 +32,21 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     fetchBookings();
     fetchResources();
-  }, [filters]);
+  }, []);
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (customFilters = filters) => {
     setLoading(true);
     try {
       const params = {};
-      if (filters.status) params.status = filters.status;
-      if (filters.date) params.date = filters.date;
-      if (filters.resourceId) params.resourceId = filters.resourceId;
+      if (customFilters.status) params.status = customFilters.status;
+      if (customFilters.date) params.date = customFilters.date;
+      if (customFilters.resourceId) params.resourceId = customFilters.resourceId;
 
       const response = await bookingAPI.getAllBookings(params);
-      setBookings(response.data);
+      setBookings(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      toast.error('Failed to fetch bookings');
+      console.error('Failed to fetch bookings:', error);
+      toast.error(error.response?.data?.message || 'Failed to fetch bookings');
     } finally {
       setLoading(false);
     }
@@ -54,9 +55,10 @@ const AdminDashboardPage = () => {
   const fetchResources = async () => {
     try {
       const response = await resourceAPI.getActiveResources();
-      setResources(response.data);
+      setResources(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      toast.error('Failed to fetch resources');
+      console.error('Failed to fetch resources:', error);
+      toast.error(error.response?.data?.message || 'Failed to fetch resources');
     }
   };
 
@@ -66,8 +68,8 @@ const AdminDashboardPage = () => {
       toast.success('Booking approved successfully');
       fetchBookings();
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to approve booking';
-      toast.error(errorMessage);
+      console.error('Approve failed:', error);
+      toast.error(error.response?.data?.message || 'Failed to approve booking');
     }
   };
 
@@ -77,39 +79,59 @@ const AdminDashboardPage = () => {
     setShowRejectModal(true);
   };
 
+  const closeRejectModal = () => {
+    setShowRejectModal(false);
+    setSelectedBooking(null);
+    setRejectionReason('');
+    setSubmittingReject(false);
+  };
+
   const handleReject = async () => {
-    if (!rejectionReason.trim()) {
+    const trimmedReason = rejectionReason.trim();
+
+    if (!selectedBooking?.id) {
+      toast.error('No booking selected');
+      return;
+    }
+
+    if (!trimmedReason) {
       toast.error('Please provide a rejection reason');
       return;
     }
 
     try {
-      await bookingAPI.rejectBooking(selectedBooking.id, rejectionReason);
+      setSubmittingReject(true);
+      await bookingAPI.rejectBooking(selectedBooking.id, trimmedReason);
       toast.success('Booking rejected successfully');
-      setShowRejectModal(false);
-      setSelectedBooking(null);
-      setRejectionReason('');
+      closeRejectModal();
       fetchBookings();
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to reject booking';
-      toast.error(errorMessage);
+      console.error('Reject failed:', error);
+      toast.error(error.response?.data?.message || 'Failed to reject booking');
+      setSubmittingReject(false);
     }
   };
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       [name]: value
     }));
   };
 
+  const applyFilters = () => {
+    fetchBookings(filters);
+  };
+
   const clearFilters = () => {
-    setFilters({
+    const cleared = {
       status: '',
       date: '',
       resourceId: ''
-    });
+    };
+    setFilters(cleared);
+    fetchBookings(cleared);
   };
 
   const getStatusBadge = (status) => {
@@ -125,7 +147,7 @@ const AdminDashboardPage = () => {
         text: 'Approved'
       },
       REJECTED: {
-        color: 'bg-green-100 text-red-800',
+        color: 'bg-red-100 text-red-800',
         icon: <XCircle className="h-4 w-4" />,
         text: 'Rejected'
       },
@@ -162,10 +184,6 @@ const AdminDashboardPage = () => {
     });
   };
 
-  const getToday = () => {
-    return new Date().toISOString().split('T')[0];
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -183,7 +201,6 @@ const AdminDashboardPage = () => {
         </p>
       </div>
 
-      {/* Filters */}
       <div className="bg-white shadow rounded-lg p-4 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-gray-900 flex items-center">
@@ -197,11 +214,14 @@ const AdminDashboardPage = () => {
             Clear all
           </button>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label htmlFor="booking-status-filter" className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
             <select
+              id="booking-status-filter"
               name="status"
               value={filters.status}
               onChange={handleFilterChange}
@@ -214,10 +234,13 @@ const AdminDashboardPage = () => {
               <option value="CANCELLED">Cancelled</option>
             </select>
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <label htmlFor="booking-date-filter" className="block text-sm font-medium text-gray-700 mb-1">
+              Date
+            </label>
             <input
+              id="booking-date-filter"
               type="date"
               name="date"
               value={filters.date}
@@ -225,10 +248,13 @@ const AdminDashboardPage = () => {
               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
             />
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Resource</label>
+            <label htmlFor="booking-resource-filter" className="block text-sm font-medium text-gray-700 mb-1">
+              Resource
+            </label>
             <select
+              id="booking-resource-filter"
               name="resourceId"
               value={filters.resourceId}
               onChange={handleFilterChange}
@@ -242,11 +268,11 @@ const AdminDashboardPage = () => {
               ))}
             </select>
           </div>
-          
+
           <div className="flex items-end">
             <button
-              onClick={fetchBookings}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              onClick={applyFilters}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
             >
               <Search className="h-4 w-4 mr-2" />
               Apply Filters
@@ -255,7 +281,6 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
-      {/* Bookings List */}
       {bookings.length === 0 ? (
         <div className="text-center py-12">
           <Calendar className="mx-auto h-12 w-12 text-gray-400" />
@@ -285,7 +310,7 @@ const AdminDashboardPage = () => {
                           {getStatusBadge(booking.status)}
                         </div>
                       </div>
-                      
+
                       <div className="mt-2 sm:flex sm:justify-between">
                         <div className="sm:flex sm:flex-wrap">
                           <p className="flex items-center text-sm text-gray-500 sm:mr-6">
@@ -305,6 +330,7 @@ const AdminDashboardPage = () => {
                             {booking.attendeesCount} attendees
                           </p>
                         </div>
+
                         <div className="mt-2 flex items-center space-x-2 sm:mt-0">
                           {booking.status === 'PENDING' && (
                             <>
@@ -326,7 +352,7 @@ const AdminDashboardPage = () => {
                           )}
                         </div>
                       </div>
-                      
+
                       {booking.purpose && (
                         <div className="mt-2">
                           <p className="flex items-start text-sm text-gray-500">
@@ -335,7 +361,7 @@ const AdminDashboardPage = () => {
                           </p>
                         </div>
                       )}
-                      
+
                       {booking.rejectionReason && (
                         <div className="mt-2">
                           <p className="text-sm text-red-600">
@@ -352,58 +378,62 @@ const AdminDashboardPage = () => {
         </div>
       )}
 
-      {/* Reject Modal */}
       {showRejectModal && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-            
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="w-full">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                      Reject Booking
-                    </h3>
-                    
-                    {selectedBooking && (
-                      <div className="mb-4 p-3 bg-gray-50 rounded-md">
-                        <p className="text-sm text-gray-600">
-                          <strong>Resource:</strong> {selectedBooking.resourceName}<br />
-                          <strong>User:</strong> {selectedBooking.userName}<br />
-                          <strong>Date:</strong> {formatDate(selectedBooking.date)}<br />
-                          <strong>Time:</strong> {formatTime(selectedBooking.startTime)} - {formatTime(selectedBooking.endTime)}
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Rejection Reason
-                      </label>
-                      <textarea
-                        value={rejectionReason}
-                        onChange={(e) => setRejectionReason(e.target.value)}
-                        rows={4}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                        placeholder="Please provide a reason for rejecting this booking..."
-                      />
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center px-4">
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-75"
+              onClick={closeRejectModal}
+            />
+
+            <div className="relative bg-white rounded-lg text-left overflow-hidden shadow-xl sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
+                <div className="w-full">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                    Reject Booking
+                  </h3>
+
+                  {selectedBooking && (
+                    <div className="mb-4 p-3 bg-gray-50 rounded-md">
+                      <p className="text-sm text-gray-600">
+                        <strong>Resource:</strong> {selectedBooking.resourceName}<br />
+                        <strong>User:</strong> {selectedBooking.userName}<br />
+                        <strong>Date:</strong> {formatDate(selectedBooking.date)}<br />
+                        <strong>Time:</strong> {formatTime(selectedBooking.startTime)} - {formatTime(selectedBooking.endTime)}
+                      </p>
                     </div>
+                  )}
+
+                  <div>
+                    <label htmlFor="rejection-reason" className="block text-sm font-medium text-gray-700 mb-2">
+                      Rejection Reason
+                    </label>
+                    <textarea
+                      id="rejection-reason"
+                      name="rejectionReason"
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                      rows={4}
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      placeholder="Please provide a reason for rejecting this booking..."
+                    />
                   </div>
                 </div>
               </div>
+
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button
                   type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  disabled={submittingReject}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 disabled:opacity-50 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={handleReject}
                 >
-                  Reject Booking
+                  {submittingReject ? 'Rejecting...' : 'Reject Booking'}
                 </button>
                 <button
                   type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => setShowRejectModal(false)}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={closeRejectModal}
                 >
                   Cancel
                 </button>
@@ -416,4 +446,4 @@ const AdminDashboardPage = () => {
   );
 };
 
-export default AdminDashboardPage;
+export default BookingDashboardPage;

@@ -15,7 +15,7 @@ import com.sliit.campus_core.entity.BookingStatus;
 @Repository
 public interface BookingRepository extends MongoRepository<Booking, String> {
     
-    List<Booking> findByUserIdOrderByCreatedAtDesc(String userId);
+    List<Booking> findByUser_IdOrderByCreatedAtDesc(String userId);
     
     List<Booking> findByResourceIdAndDateAndStatus(String resourceId, LocalDate date, BookingStatus status);
     
@@ -40,5 +40,5 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
             String resourceId
     );
     
-    Optional<Booking> findByIdAndUserId(String id, String userId);
+    Optional<Booking> findByIdAndUser_Id(String id, String userId);
 }

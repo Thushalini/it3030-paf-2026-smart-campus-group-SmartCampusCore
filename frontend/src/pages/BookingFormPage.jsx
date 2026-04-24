@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { bookingAPI, resourceAPI } from '../services/api';
 import { toast } from 'react-hot-toast';
@@ -8,14 +8,10 @@ import { Calendar, Clock, MapPin, Users, FileText } from 'lucide-react';
 
 const BookingFormPage = () => {
   const { user } = useAuth();
-  const location = useLocation();
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
-    defaultValues: {
-      resourceId: location.state?.resourceId || ''
-    }
-  });
+  const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [selectedResource, setSelectedResource] = useState(null);
 
   const selectedResourceId = watch('resourceId');
@@ -43,6 +39,9 @@ const BookingFormPage = () => {
   };
 
   const onSubmit = async (data) => {
+    const confirmSubmit = window.confirm("Are you sure you want to submit this booking request?");
+  
+    if (!confirmSubmit) return;
     setLoading(true);
     
     try {
@@ -58,9 +57,9 @@ const BookingFormPage = () => {
       await bookingAPI.createBooking(bookingData);
       toast.success('Booking request submitted successfully!');
       
-      // Reset form
-      document.getElementById('booking-form').reset();
-      setSelectedResource(null);
+      setTimeout(() => {
+        navigate('/user/bookings'); 
+      }, 1500);
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to create booking';
@@ -91,7 +90,7 @@ const BookingFormPage = () => {
               </label>
               <select
                 {...register('resourceId', { required: 'Resource is required' })}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="">Choose a resource...</option>
                 {resources.map((resource) => (
@@ -133,7 +132,7 @@ const BookingFormPage = () => {
                   min: { value: getToday(), message: 'Date must be today or in the future' }
                 })}
                 min={getToday()}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
               {errors.date && (
                 <p className="mt-1 text-sm text-red-600">{errors.date.message}</p>
@@ -150,7 +149,7 @@ const BookingFormPage = () => {
                 <input
                   type="time"
                   {...register('startTime', { required: 'Start time is required' })}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 {errors.startTime && (
                   <p className="mt-1 text-sm text-red-600">{errors.startTime.message}</p>
@@ -165,7 +164,7 @@ const BookingFormPage = () => {
                 <input
                   type="time"
                   {...register('endTime', { required: 'End time is required' })}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 {errors.endTime && (
                   <p className="mt-1 text-sm text-red-600">{errors.endTime.message}</p>
@@ -185,7 +184,7 @@ const BookingFormPage = () => {
                   maxLength: { value: 500, message: 'Purpose must not exceed 500 characters' }
                 })}
                 rows={3}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Describe the purpose of your booking..."
               />
               {errors.purpose && (
@@ -208,7 +207,7 @@ const BookingFormPage = () => {
                 })}
                 min="1"
                 max={selectedResource?.capacity || 1000}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Number of people attending"
               />
               {errors.attendeesCount && (
@@ -231,7 +230,7 @@ const BookingFormPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
