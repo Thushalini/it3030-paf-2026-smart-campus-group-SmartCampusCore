@@ -129,18 +129,15 @@ function AdminResourcesPage() {
               {resources.map((resource) => (
                 <tr key={resource.id}>
                   <td>
-                    <img
-                      src={
-                        resource.imageUrls?.[0] ||
-                        "https://images.unsplash.com/photo-1497366412874-3415097a27e7"
-                      }
-                      alt={resource.name}
-                      className="admin-resource-thumb"
-                      onError={(e) => {
-                        e.target.src =
-                          "https://images.unsplash.com/photo-1497366412874-3415097a27e7";
-                      }}
-                    />
+                  {resource.imageUrls?.[0] ? (
+                      <img
+                        src={resource.imageUrls[0]}
+                        alt={resource.name}
+                        className="admin-resource-thumb"
+                      />
+                    ) : (
+                      <span className="no-image-text">No Image</span>
+                    )}
                   </td>
 
                   <td>{resource.name}</td>
