@@ -33,9 +33,6 @@ public class Resource {
     private List<String> features;
     private List<String> imageUrls;
 
-    private LocalTime startTime;
-    private LocalTime endTime;
-
     @Field("imageUrl")
     private String legacyImageUrl;
 
