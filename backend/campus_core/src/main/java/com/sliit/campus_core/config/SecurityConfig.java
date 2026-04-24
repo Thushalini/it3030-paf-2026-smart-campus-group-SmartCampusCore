@@ -70,7 +70,7 @@ public class SecurityConfig {
                 // 3. Explicitly allow pre-flight OPTIONS requests for all endpoints
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // --- Your existing team routes (DO NOT REMOVE) ---
-                .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/google", "/oauth2/**").permitAll()
+                .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/google", "/api/auth/forgot-password", "/api/auth/reset-password", "/oauth2/**").permitAll()
                 .requestMatchers("/favicon.ico", "/static/**", "/assets/**", "/uploads/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")

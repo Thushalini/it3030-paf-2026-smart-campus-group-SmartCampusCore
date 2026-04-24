@@ -14,6 +14,9 @@ import com.sliit.campus_core.entity.Role;
 import com.sliit.campus_core.entity.Status;
 import com.sliit.campus_core.entity.User;
 import com.sliit.campus_core.entity.UserType;
+import com.sliit.campus_core.exception.BadRequestException;
+import com.sliit.campus_core.exception.UserNotFoundException;
+import com.sliit.campus_core.exception.FileStorageException;
 import com.sliit.campus_core.repository.UserRepository;
 import com.sliit.campus_core.security.JwtUtil;
 
@@ -28,7 +31,7 @@ public class UserService {
 
     public User getByEmail(String email) {
         return repository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public User createIfNotExists(String name, String email, Role role) {
@@ -54,7 +57,7 @@ public class UserService {
     // ✅ GET user by ID
     public User getUserById(String id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     // ✅ CREATE user
@@ -66,7 +69,7 @@ public class UserService {
     public User updateUser(String id, User updatedUser) {
 
         User existingUser = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // 🔹 Basic fields
         existingUser.setName(updatedUser.getName());
@@ -105,7 +108,7 @@ public class UserService {
 
     public User updateUserRole(String id, Role role) {
         User user = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         user.setRole(role);
         return repository.save(user);
@@ -115,7 +118,7 @@ public class UserService {
     public void deleteUser(String id) {
 
         if (!repository.existsById(id)) {
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException("User not found");
         }
 
         User user = getUserById(id);
@@ -126,7 +129,7 @@ public class UserService {
     public User enableUser(String id) {
 
         User user = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         user.setStatus(Status.ACTIVE);
 
@@ -137,7 +140,7 @@ public class UserService {
     public User getLoggedUser(String token) {
         String email = jwtUtil.extractEmail(token.substring(7));
         return repository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     // ✅ Get My Profile
@@ -160,14 +163,14 @@ public class UserService {
 
             if (updated.getUserType() == UserType.STUDENT) {
                 if (updated.getStudentId() == null || updated.getStudentId().trim().isEmpty()) {
-                    throw new RuntimeException("Student ID required");
+                    throw new BadRequestException("Student ID required");
                 }
                 user.setStudentId(updated.getStudentId());
                 user.setStaffId(null);
             } 
             else if (updated.getUserType() == UserType.STAFF) {
                 if (updated.getStaffId() == null || updated.getStaffId().trim().isEmpty()) {
-                    throw new RuntimeException("Staff ID required");
+                    throw new BadRequestException("Staff ID required");
                 }
                 user.setStaffId(updated.getStaffId());
                 user.setStudentId(null);
@@ -211,7 +214,7 @@ public class UserService {
             return "Uploaded successfully: " + fileName;
 
         } catch (IOException e) {
-            throw new RuntimeException("File upload failed");
+            throw new FileStorageException("File upload failed");
         }
     }
 }
