@@ -9,9 +9,12 @@ import {
 } from "../api/notificationApi";
 import AdminNotificationAnalytics from "./AdminNotificationAnalytics";
 
+import toast from "react-hot-toast";
+import swal from "sweetalert2"
+
 const ROLES        = ["ALL", "TECHNICIAN", "USER", "ADMIN"];
 const TYPES        = ["ANNOUNCEMENT", "BOOKING", "TICKET", "COMMENT"];
-const FILTER_TYPES = ["ALL", "ANNOUNCEMENT", "BOOKING", "TICKET", "COMMENT"];
+const FILTER_TYPES = ["ALL", "BOOKING", "TICKET", "COMMENT"];
 
 export default function AdminNotificationsPanel() {
   const [tab, setTab]               = useState("send");   // "send" | "inbox" | "analytics"
@@ -24,49 +27,81 @@ export default function AdminNotificationsPanel() {
   const [sending, setSending]       = useState(false);
   const [feedback, setFeedback]     = useState(null);
 
+  const confirmAction = async (text) => {
+    const res = await Swal.fire({
+      title: "Confirm",
+      text,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#2563eb",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes",
+    });
+    return res.isConfirmed;
+  };
+
   const loadHistory = async () => {
     try {
       const res = await getNotificationHistory();
       setHistory(res.data);
-    } catch (err) { console.error(err); }
+    } catch {
+      toast.error("Failed to load history");
+    }
   };
-
+ 
   const loadAllNotifs = async (ft = filterType) => {
     try {
       const res = await getAllNotificationsAdmin(ft === "ALL" ? "" : ft);
       setAllNotifs(res.data);
-    } catch (err) { console.error(err); }
+    } catch {
+      toast.error("Failed to load notifications");
+    }
   };
 
   useEffect(() => { loadHistory(); loadAllNotifs(); }, []);
 
   const handleSend = async () => {
-    if (!message.trim()) return;
+    if (!message.trim()) {
+      toast.error("Message cannot be empty");
+      return;
+    }
     setSending(true);
     setFeedback(null);
     try {
       const res = target === "ALL"
         ? await broadcastNotification(message, type)
         : await sendToRole(target, message, type);
-      setFeedback({ ok: true, text: `Sent to ${res.data.sent} user(s).` });
+      toast.success(`Sent to ${res.data.sent} user(s).`);
       setMessage("");
       loadHistory();
       loadAllNotifs();
-    } catch (err) {
-      setFeedback({ ok: false, text: "Failed to send." });
+    } catch {
+      toast.error("Failed to send notification");
     } finally {
       setSending(false);
     }
   };
 
   const handleDeleteLog = async (logId) => {
-    await deleteNotificationLog(logId);
-    setHistory((prev) => prev.filter((l) => l.id !== logId));
+    if (!await confirmAction("Delete this log?")) return;
+    try {
+      await deleteNotificationLog(logId);
+      setHistory((prev) => prev.filter((l) => l.id !== logId));
+      toast.success("Log deleted");
+    } catch {
+      toast.error("Failed to delete log");
+    }
   };
 
   const handleDeleteNotif = async (id) => {
-    await deleteNotificationById(id);
-    setAllNotifs((prev) => prev.filter((n) => n.id !== id));
+    if (!await confirmAction("Delete this notification?")) return;
+      try {
+      await deleteNotificationById(id);
+      setAllNotifs((prev) => prev.filter((n) => n.id !== id));
+      toast.success("Notification deleted");
+    } catch {
+      toast.error("Failed to delete notification");
+    }
   };
 
   const handleFilterChange = (ft) => {
@@ -81,11 +116,9 @@ export default function AdminNotificationsPanel() {
     });
 
   const typeBadgeColor = (t) => ({
-    ANNOUNCEMENT: "bg-blue-100 text-blue-700",
     BOOKING:      "bg-green-100 text-green-700",
     TICKET:       "bg-orange-100 text-orange-700",
     COMMENT:      "bg-purple-100 text-purple-700",
-    TEST:         "bg-gray-100 text-gray-600",
   }[t] ?? "bg-gray-100 text-gray-600");
 
   return (

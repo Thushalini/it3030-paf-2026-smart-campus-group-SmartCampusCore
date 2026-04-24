@@ -91,6 +91,24 @@ function ResourceFormPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    const nonNegativeFields = [
+      "capacity",
+      "ratingAverage",
+      "ratingCount",
+      "bookingCount",
+    ];
+
+    if (nonNegativeFields.includes(name)) {
+      if (value === "" || Number(value) >= 0) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      }
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -186,6 +204,24 @@ function ResourceFormPage() {
       const combinedImageUrls = Array.from(
         new Set([...(formData.imageUrls || []), ...uploadedUrls, ...manualUrls])
       );
+
+      // Validation
+      if (formData.capacity < 0) {
+        setError("Capacity cannot be negative");
+        return;
+      }
+      if (formData.ratingAverage < 0) {
+        setError("Rating average cannot be negative");
+        return;
+      }
+      if (formData.ratingCount < 0) {
+        setError("Rating count cannot be negative");
+        return;
+      }
+      if (formData.bookingCount < 0) {
+        setError("Booking count cannot be negative");
+        return;
+      }
 
       const payload = {
         ...formData,
@@ -302,6 +338,8 @@ function ResourceFormPage() {
                 value={formData.capacity}
                 onChange={handleChange}
                 required
+                min="1"
+                step="1"
               />
             </div>
 
@@ -500,6 +538,8 @@ function ResourceFormPage() {
                 name="ratingAverage"
                 value={formData.ratingAverage}
                 onChange={handleChange}
+                min="0"
+                max="5"
               />
             </div>
 
@@ -510,6 +550,7 @@ function ResourceFormPage() {
                 name="ratingCount"
                 value={formData.ratingCount}
                 onChange={handleChange}
+                min="0"
               />
             </div>
 
@@ -520,6 +561,7 @@ function ResourceFormPage() {
                 name="bookingCount"
                 value={formData.bookingCount}
                 onChange={handleChange}
+                min="0"
               />
             </div>
           </div>

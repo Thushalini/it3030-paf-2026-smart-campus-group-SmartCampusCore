@@ -2,20 +2,17 @@ package com.sliit.campus_core.controller;
 
 import java.util.Map;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.sliit.campus_core.dto.LoginRequest;
-import com.sliit.campus_core.dto.SignupRequest;
-import com.sliit.campus_core.dto.ForgotPasswordRequest;
-import com.sliit.campus_core.dto.ResetPasswordRequest;
+import com.sliit.campus_core.dto.*;
 import com.sliit.campus_core.entity.User;
 import com.sliit.campus_core.service.AuthService;
+import com.sliit.campus_core.exception.BadRequestException;
+import com.sliit.campus_core.exception.InvalidCredentialsException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,51 +24,56 @@ public class AuthController {
         this.authService = authService;
     }
 
+    // ✅ SIGNUP
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest request) {
         return ResponseEntity.ok(authService.signup(request));
     }
 
+    // ✅ LOGIN
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    // 🔥 NEW: Get logged-in user
+    // ✅ GET CURRENT USER
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
 
         if (authentication == null) {
-            return ResponseEntity.status(401).body("Unauthorized");
+            throw new InvalidCredentialsException("User not authenticated");
         }
 
         String email = authentication.getName();
-
         User user = authService.getUserByEmail(email);
 
         return ResponseEntity.ok(user);
     }
 
-    // 🔥 NEW: Google login
+    // ✅ GOOGLE LOGIN
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> body) {
-        System.out.println(">>> /api/auth/google hit, body keys: " + body.keySet());
-        System.out.println(">>> token value: " + body.get("token"));
-        
+
         String googleToken = body.get("token");
+
         if (googleToken == null || googleToken.isBlank()) {
-            return ResponseEntity.badRequest().body("Missing token");
+            throw new BadRequestException("Google token is required");
         }
+
         return ResponseEntity.ok(authService.googleLogin(googleToken));
     }
 
+    // ✅ FORGOT PASSWORD
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         return ResponseEntity.ok(authService.forgotPassword(request.getEmail()));
     }
 
+    // ✅ RESET PASSWORD
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-        return ResponseEntity.ok(authService.resetPassword(request.getToken(), request.getNewPassword()));
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(
+                authService.resetPassword(request.getToken(), request.getNewPassword())
+        );
     }
 }

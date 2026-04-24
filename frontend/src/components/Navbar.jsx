@@ -13,7 +13,7 @@ const Navbar = () => {
       display: "flex",
       justifyContent: "space-between"
     }}>
-      <h3>Dashboard</h3>
+      <h3>Welcome to Smart Campus Core</h3>
       <NotificationBell />
 
       <div>

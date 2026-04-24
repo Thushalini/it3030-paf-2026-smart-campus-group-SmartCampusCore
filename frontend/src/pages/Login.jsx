@@ -40,7 +40,10 @@ function Login() {
             navigate("/dashboard", { replace: true });
         } catch (err) {
             console.error(err);
-            setError("Invalid email or password");
+            setError(
+                err.response?.data?.message ||
+                "Invalid email or password"
+            );
         } finally {
             setLoading(false);
         }
@@ -55,7 +58,10 @@ function Login() {
             navigate("/dashboard", { replace: true });
         } catch (err) {
             console.error("Google login error:", err);
-            setError("Google login failed");
+            setError(
+                err.response?.data?.message ||
+                "Google login failed"
+            );
         }
     };
 

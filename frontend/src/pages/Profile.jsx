@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
+
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -10,7 +13,22 @@ export default function Profile() {
   const token = sessionStorage.getItem("token");
   const API = "http://localhost:8080/api/profile";
 
-  useEffect(() => { fetchProfile(); }, []);
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const confirmAction = async (text) => {
+    const res = await Swal.fire({
+      title: "Confirm",
+      text,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#2563eb",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes",
+    });
+    return res.isConfirmed;
+  };
 
   const fetchProfile = async () => {
     try {
@@ -18,29 +36,38 @@ export default function Profile() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(res.data);
+    } catch {
+      toast.error("Failed to load profile");
     } finally {
       setLoading(false);
     }
   };
 
   const handleSave = async () => {
-    if (!window.confirm("Save changes?")) return;
+    const ok = await confirmAction("Save changes?");
+    if (!ok) return;
 
     if (user.userType === "STUDENT" && !user.studentId?.trim()) {
-      alert("Student ID is required");
+      toast.error("Student ID is required");
       return;
     }
+
     if (user.userType === "STAFF" && !user.staffId?.trim()) {
-      alert("Staff ID is required");
+      toast.error("Staff ID is required");
       return;
     }
 
-    await axios.put(`${API}/update`, user, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      await axios.put(`${API}/update`, user, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    setEditMode(false);
-    fetchProfile();
+      toast.success("Profile updated");
+      setEditMode(false);
+      fetchProfile();
+    } catch {
+      toast.error("Update failed");
+    }
   };
 
   const handleImageUpload = async (e) => {
@@ -57,11 +84,27 @@ export default function Profile() {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      toast.success("Profile picture updated");
       fetchProfile();
-      alert("Profile picture updated!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to upload image");
+    } catch {
+      toast.error("Image upload failed");
+    }
+  };
+
+  const handleDisableAccount = async () => {
+    const ok = await confirmAction("Disable your account?");
+    if (!ok) return;
+
+    try {
+      await axios.delete(`${API}/disable`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success("Account disabled");
+      navigate("/login");
+    } catch {
+      toast.error("Failed to disable account");
     }
   };
 
@@ -78,24 +121,19 @@ export default function Profile() {
         className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden"
       >
 
-        {/* TOP BANNER */}
         <div className="h-28 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
 
-        {/* Avatar */}
         <div className="flex flex-col items-center -mt-16">
           <label className="cursor-pointer relative group">
             <motion.img
               whileHover={{ scale: 1.05 }}
               src={
                 user.profileImage?.trim()
-                  ? `http://localhost:8080/${user.profileImage.replace(/^\/+/, '')}`
+                  ? `http://localhost:8080/${user.profileImage.replace(/^\/+/, "")}`
                   : `https://ui-avatars.com/api/?name=${user.name}`
               }
-              className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg transition-opacity group-hover:opacity-80"
+              className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg"
             />
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="text-white bg-black bg-opacity-50 px-2 py-1 rounded text-xs font-semibold">Change</span>
-            </div>
             <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
           </label>
 
@@ -116,7 +154,6 @@ export default function Profile() {
           <InputField label="Department" value={user.department} editMode={editMode}
             onChange={(val) => setUser({ ...user, department: val })} />
 
-          {/* User Type */}
           <div>
             <label className="text-sm text-gray-500">User Type</label>
             {editMode ? (
@@ -134,7 +171,6 @@ export default function Profile() {
             )}
           </div>
 
-          {/* Conditional Fields */}
           {user.userType === "STUDENT" && (
             <InputField label="Student ID" value={user.studentId} editMode={editMode}
               onChange={(val) => setUser({ ...user, studentId: val })} />
@@ -148,10 +184,11 @@ export default function Profile() {
 
         {/* Buttons */}
         <div className="mt-6 space-y-2">
+
           {!editMode ? (
             <button
               onClick={() => setEditMode(true)}
-              className="w-full py-2 rounded-xl bg-black text-white hover:bg-gray-800 transition"
+              className="w-full py-2 rounded-xl bg-black text-white hover:bg-gray-800"
             >
               Edit Profile
             </button>
@@ -159,23 +196,27 @@ export default function Profile() {
             <>
               <button
                 onClick={handleSave}
-                className="w-full py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition"
+                className="w-full py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
               >
                 Save Changes
               </button>
 
               <button
                 onClick={() => setEditMode(false)}
-                className="w-full py-2 rounded-xl bg-gray-300 hover:bg-gray-400 transition"
+                className="w-full py-2 rounded-xl bg-gray-300"
               >
                 Cancel
               </button>
             </>
           )}
 
-          <button className="w-full py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition">
+          <button
+            onClick={handleDisableAccount}
+            className="w-full py-2 rounded-xl bg-red-500 text-white hover:bg-red-600"
+          >
             Disable Account
           </button>
+
         </div>
 
       </motion.div>
@@ -191,7 +232,7 @@ function InputField({ label, value, editMode, onChange }) {
         <input
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full mt-1 p-2 rounded-lg border focus:ring-2 focus:ring-blue-400 outline-none transition"
+          className="w-full mt-1 p-2 rounded-lg border"
         />
       ) : (
         <p className="font-medium">{value || "-"}</p>

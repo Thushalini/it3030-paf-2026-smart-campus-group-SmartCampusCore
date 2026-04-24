@@ -1,6 +1,9 @@
 package com.sliit.campus_core.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class ForgotPasswordRequest {
+    @NotBlank(message = "Email is required")
     private String email;
 
     public String getEmail() {
