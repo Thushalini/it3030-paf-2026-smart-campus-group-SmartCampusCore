@@ -1,7 +1,6 @@
 package com.sliit.campus_core.ticket.service.impl;
 
 import com.sliit.campus_core.dto.NotificationRequestDTO;
-import com.sliit.campus_core.dto.ticket.ContactDetailsDTO;
 import com.sliit.campus_core.dto.ticket.TicketAnalyticsDTO;
 import com.sliit.campus_core.dto.ticket.TicketAssignRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketCreateRequestDTO;
@@ -33,7 +32,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +40,6 @@ import java.util.List;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
-    private final AtomicInteger sequence = new AtomicInteger(1);
 
     @Autowired
     private TicketStatusHistoryRepository ticketStatusHistoryRepository;
@@ -77,8 +74,25 @@ public class TicketServiceImpl implements TicketService {
         ticket.setReportedByName(reportedByName);
         ticket.setReportedByEmail(reportedByEmail);
 
-        String ticketNumber = "TKT-" + Year.now().getValue() + "-" +
-                String.format("%04d", sequence.getAndIncrement());
+        String year = String.valueOf(Year.now().getValue());
+        String prefix = "TKT-" + year + "-";
+
+        // Query DB for the highest ticket number this year
+        Optional<Ticket> lastTicket = ticketRepository
+                .findFirstByTicketNumberStartingWithOrderByTicketNumberDesc(prefix);
+
+        int nextSeq = 1;
+        if (lastTicket.isPresent()) {
+            String lastNum = lastTicket.get().getTicketNumber();
+            try {
+                String seqPart = lastNum.substring(lastNum.lastIndexOf('-') + 1);
+                nextSeq = Integer.parseInt(seqPart) + 1;
+            } catch (Exception e) {
+                nextSeq = 1; // fallback
+            }
+        }
+
+        String ticketNumber = prefix + String.format("%04d", nextSeq);
         ticket.setTicketNumber(ticketNumber);
 
         ticket.setStatus(TicketStatus.OPEN);
@@ -99,7 +113,7 @@ public class TicketServiceImpl implements TicketService {
 
         NotificationRequestDTO req = new NotificationRequestDTO();
         req.setRecipientUserId(reportedById);
-        req.setType("TICKET_CREATED");
+        req.setType("TICKET");
         req.setTitle("New Ticket Created");
         req.setMessage(ticket.getTitle());
         req.setReferenceId(ticket.getId());
@@ -172,6 +186,9 @@ public class TicketServiceImpl implements TicketService {
             throw new InvalidStatusTransitionException("Cannot transition from " + ticket.getStatus() + " to " + dto.getNewStatus());
         }
 
+        // FIX: Capture fromStatus BEFORE mutating the ticket
+        TicketStatus fromStatus = ticket.getStatus();
+
         ticket.setStatus(dto.getNewStatus());
         ticket.setUpdatedAt(Instant.now());
 
@@ -202,7 +219,7 @@ public class TicketServiceImpl implements TicketService {
 
         TicketStatusHistory history = TicketStatusHistory.builder()
                 .ticketId(ticketId)
-                .fromStatus(ticket.getStatus().name())
+                .fromStatus(fromStatus.name())          // FIX: was ticket.getStatus().name() (already mutated)
                 .toStatus(dto.getNewStatus().name())
                 .changedById(changedById)
                 .changedByName(changedByName)
@@ -215,7 +232,7 @@ public class TicketServiceImpl implements TicketService {
 
         NotificationRequestDTO req = new NotificationRequestDTO();
         req.setRecipientUserId(ticket.getReportedById());
-        req.setType("TICKET_STATUS_CHANGED");
+        req.setType("TICKET");
         req.setTitle("Status Updated");
         req.setMessage("Ticket status changed to " + ticket.getStatus());
         req.setReferenceId(ticket.getId());
@@ -226,7 +243,8 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketResponseDTO assignTechnician(String ticketId, TicketAssignRequestDTO dto, String adminId) {
+    public TicketResponseDTO assignTechnician(String ticketId, TicketAssignRequestDTO dto,
+                                              String adminId, String adminName, String adminRole) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
@@ -236,18 +254,38 @@ public class TicketServiceImpl implements TicketService {
 
         ticket.setAssignedToId(dto.getTechnicianId());
         ticket.setAssignedToName(dto.getTechnicianName());
-        ticketRepository.save(ticket);
+
+        // NEW: Auto-transition OPEN → IN_PROGRESS when a technician is assigned
+        TicketStatus previousStatus = ticket.getStatus();
+        if (ticket.getStatus() == TicketStatus.OPEN) {
+            ticket.setStatus(TicketStatus.IN_PROGRESS);
+            ticket.setUpdatedAt(Instant.now());
+
+            TicketStatusHistory history = TicketStatusHistory.builder()
+                    .ticketId(ticketId)
+                    .fromStatus(previousStatus.name())
+                    .toStatus(TicketStatus.IN_PROGRESS.name())
+                    .changedById(adminId)
+                    .changedByName(adminName)
+                    .changedByRole(adminRole)
+                    .note("Technician assigned: " + dto.getTechnicianName())
+                    .changedAt(LocalDateTime.now())
+                    .build();
+            ticketStatusHistoryRepository.save(history);
+        }
+
+        Ticket saved = ticketRepository.save(ticket);
 
         NotificationRequestDTO req = new NotificationRequestDTO();
         req.setRecipientUserId(dto.getTechnicianId());
-        req.setType("TICKET_ASSIGNED");
+        req.setType("TICKET");
         req.setTitle("Technician Assigned");
         req.setMessage("Assigned to " + dto.getTechnicianName());
         req.setReferenceId(ticket.getId());
         req.setReferenceType("TICKET");
         notificationPublisher.publishTechnicianAssigned(req);
 
-        return ticketMapper.toResponseDTO(ticket);
+        return ticketMapper.toResponseDTO(saved);
     }
 
     @Override
@@ -255,11 +293,26 @@ public class TicketServiceImpl implements TicketService {
                                                 String currentUserId,
                                                 String currentRole,
                                                 Pageable pageable) {
-        if ("TECHNICIAN".equalsIgnoreCase(currentRole)) {
-            filter.setAssignedToId(currentUserId);
-        }
-        return ticketRepository.findAll(pageable)
-                .map(this::toResponseDTO);
+        Page<Ticket> page = ticketRepository.findAll(pageable);
+
+        List<Ticket> filtered = page.getContent().stream()
+                .filter(t -> {
+                    if ("TECHNICIAN".equalsIgnoreCase(currentRole)) {
+                        return currentUserId != null && currentUserId.equals(t.getAssignedToId());
+                    }
+                    return true;
+                })
+                .filter(t -> filter.getStatus() == null || t.getStatus() == filter.getStatus())
+                .filter(t -> filter.getPriority() == null || t.getPriority() == filter.getPriority())
+                .filter(t -> filter.getCategory() == null || t.getCategory() == filter.getCategory())
+                .filter(t -> filter.getResourceId() == null || filter.getResourceId().equals(t.getResourceId()))
+                .toList();
+
+        List<TicketResponseDTO> dtos = filtered.stream()
+                .map(ticketMapper::toResponseDTO)
+                .toList();
+
+        return new PageImpl<>(dtos, pageable, dtos.size());
     }
 
     @Override
@@ -311,26 +364,4 @@ public class TicketServiceImpl implements TicketService {
                 .map(ticketMapper::toResponseDTO);
     }
 
-    private TicketResponseDTO toResponseDTO(Ticket ticket) {
-        TicketResponseDTO dto = new TicketResponseDTO();
-        dto.setId(ticket.getId());
-        dto.setTicketNumber(ticket.getTicketNumber());
-        dto.setTitle(ticket.getTitle());
-        dto.setLocation(ticket.getLocation());
-        dto.setCategory(ticket.getCategory());
-        dto.setDescription(ticket.getDescription());
-        dto.setPriority(ticket.getPriority());
-        dto.setStatus(ticket.getStatus());
-        dto.setReportedById(ticket.getReportedById());
-        dto.setReportedByName(ticket.getReportedByName());
-        dto.setReportedByEmail(ticket.getReportedByEmail());
-        dto.setContactDetails(ContactDetailsDTO.fromEntity(ticket.getContactDetails()));
-        dto.setImageUrls(ticket.getImageAttachments());
-        dto.setCreatedAt(ticket.getCreatedAt());
-        dto.setUpdatedAt(ticket.getUpdatedAt());
-        dto.setFirstResponseAt(ticket.getFirstResponseAt());
-        dto.setFirstResponseTimeMinutes(ticket.getFirstResponseTimeMinutes());
-        dto.setCommentsCount(0);
-        return dto;
-    }
 }

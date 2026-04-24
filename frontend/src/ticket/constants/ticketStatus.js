@@ -6,8 +6,8 @@ export const TicketStatus = {
   REJECTED: "REJECTED",
 };
 
-// Allowed transitions based on current status and role (simplified)
 export const getAllowedTransitions = (currentStatus, role) => {
+  // Base transitions
   const common = {
     OPEN: ["IN_PROGRESS", "REJECTED"],
     IN_PROGRESS: ["RESOLVED", "REJECTED"],
@@ -15,15 +15,34 @@ export const getAllowedTransitions = (currentStatus, role) => {
     CLOSED: [],
     REJECTED: [],
   };
-  // Admin can also move RESOLVED back to IN_PROGRESS? Not in spec, but add if needed.
+
   if (role === "ADMIN") {
     if (currentStatus === "RESOLVED") return ["CLOSED", "IN_PROGRESS"];
     if (currentStatus === "REJECTED") return ["OPEN"];
+    if (currentStatus === "OPEN") return ["IN_PROGRESS", "REJECTED"];
+    if (currentStatus === "IN_PROGRESS") return ["RESOLVED", "REJECTED"];
   }
+
   if (role === "TECHNICIAN") {
-    // Technician can only move IN_PROGRESS → RESOLVED
     if (currentStatus === "IN_PROGRESS") return ["RESOLVED"];
     return [];
   }
+
   return common[currentStatus] || [];
+};
+
+export const getStatusLabel = (status) => {
+  if (!status) return "";
+  return status.replace(/_/g, " ");
+};
+
+export const getStatusColor = (status) => {
+  const map = {
+    OPEN: "blue",
+    IN_PROGRESS: "amber",
+    RESOLVED: "green",
+    CLOSED: "gray",
+    REJECTED: "red",
+  };
+  return map[status] || "gray";
 };

@@ -177,7 +177,9 @@ public class TicketController {
             @AuthenticationPrincipal String email) {
 
         User currentUser = getUserByEmail(email);
-        TicketResponseDTO response = ticketService.assignTechnician(id, dto, currentUser.getId());
+        // CHANGE: Pass name and role so service can log history on auto-transition
+        TicketResponseDTO response = ticketService.assignTechnician(
+                id, dto, currentUser.getId(), currentUser.getName(), currentUser.getRole().name());
         return ResponseEntity.ok(ApiResponse.success("Technician assigned successfully", response));
     }
 

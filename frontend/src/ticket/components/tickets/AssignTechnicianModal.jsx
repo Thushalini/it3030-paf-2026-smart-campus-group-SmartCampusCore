@@ -1,62 +1,38 @@
 import { useState, useEffect } from "react";
-import ticketApi from "../../api/ticketApi";   // <-- ADD THIS IMPORT
+import { getTechnicians } from "../../api/ticketApi";
 import "./AssignTechnicianModal.css";
 
-/**
- * Props:
- * - ticketId (string)
- * - currentAssignee (string|null) – technician name or null
- * - onAssign (function) – called with { technicianId, technicianName }
- * - onClose (function)
- */
-export default function AssignTechnicianModal({ ticketId, currentAssignee, onAssign, onClose }) {
+export default function AssignTechnicianModal({ ticket, onAssign, onClose }) {
   const [technicians, setTechnicians] = useState([]);
   const [selectedTechId, setSelectedTechId] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Temporary mock data for fallback
-  const MOCK_TECHNICIANS = [
-    { id: "tech1", fullName: "John Doe", email: "john.doe@example.com" },
-    { id: "tech2", fullName: "Jane Smith", email: "jane.smith@example.com" },
-    { id: "tech3", fullName: "Bob Johnson", email: "bob.johnson@example.com" },
-  ];
-
   useEffect(() => {
-    const fetchTechnicians = async () => {
+    let mounted = true;
+    const fetchTechs = async () => {
       setLoading(true);
-      setError(null);
       try {
-        // Use your ticketApi instance (attaches JWT token automatically)
-        const response = await ticketApi.get("/tickets/technicians");
-        const techsArray = response.data?.data || [];
-        setTechnicians(techsArray);
-        
-        // Pre-select current assignee if found
-        if (currentAssignee) {
-          const current = techsArray.find(t => t.fullName === currentAssignee);
-          if (current) setSelectedTechId(current.id);
-        }
-      } catch (err) {
-        console.error("Failed to fetch technicians:", err);
-        // Fallback to mock data for development
-        setTechnicians(MOCK_TECHNICIANS);
-        setError("Could not load technicians from server. Using demo list.");
+        const res = await getTechnicians();
+        if (mounted) setTechnicians(res.data?.data || []);
+      } catch {
+        if (mounted) setError("Failed to load technicians");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
-    
-    fetchTechnicians();
-  }, [currentAssignee]);
+    fetchTechs();
+    return () => { mounted = false; };
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!selectedTechId) return;
-    const selected = technicians.find(t => t.id === selectedTechId);
-    if (selected) {
-      onAssign({ technicianId: selected.id, technicianName: selected.fullName });
+    if (!selectedTechId) {
+      setError("Please select a technician");
+      return;
     }
+    const tech = technicians.find((t) => t.id === selectedTechId);
+    onAssign({ technicianId: selectedTechId, technicianName: tech.fullName });
     onClose();
   };
 
@@ -64,31 +40,45 @@ export default function AssignTechnicianModal({ ticketId, currentAssignee, onAss
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h3>Assign Technician</h3>
-        {loading && <p>Loading technicians...</p>}
-        {error && <p className="error">{error}</p>}
-        {!loading && technicians.length === 0 && !error && (
-          <p>No technicians available.</p>
-        )}
-        {!loading && technicians.length > 0 && (
-          <form onSubmit={handleSubmit}>
-            <select
-              value={selectedTechId}
-              onChange={(e) => setSelectedTechId(e.target.value)}
-              required
-            >
-              <option value="">Select a technician</option>
-              {technicians.map((tech) => (
-                <option key={tech.id} value={tech.id}>
-                  {tech.fullName} ({tech.email})
-                </option>
-              ))}
-            </select>
-            <div className="modal-actions">
-              <button type="button" onClick={onClose}>Cancel</button>
-              <button type="submit">Assign</button>
-            </div>
-          </form>
-        )}
+        <p className="modal-subtitle">
+          {ticket?.ticketNumber} — <em>Will auto-set status to In Progress</em>
+        </p>
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Technician *</label>
+            {loading ? (
+              <p>Loading…</p>
+            ) : (
+              <select
+                value={selectedTechId}
+                onChange={(e) => {
+                  setSelectedTechId(e.target.value);
+                  setError(null);
+                }}
+                required
+              >
+                <option value="">Choose technician…</option>
+                {technicians.map((tech) => (
+                  <option key={tech.id} value={tech.id}>
+                    {tech.fullName} ({tech.email})
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <div className="modal-actions">
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary" disabled={!selectedTechId || loading}>
+              Assign
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

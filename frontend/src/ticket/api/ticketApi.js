@@ -1,20 +1,32 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api/v1";
+const API_BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api/v1";
 
-const ticketApi = axios.create({ baseURL: API_BASE });
+const ticketApi = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true,
+});
 
-// Auto-attach JWT token from sessionStorage (set by Member 4's OAuth login)
+// Auto-attach JWT token (supports both localStorage keys our team uses)
 ticketApi.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem("token") 
-             || sessionStorage.getItem("jwt") 
-             || sessionStorage.getItem("accessToken");
+  const token = localStorage.getItem("token") 
+             || localStorage.getItem("jwt") 
+             || sessionStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
-}, (error) => Promise.reject(error));
+});
 
+// Strip empty/null/undefined params so Spring doesn't try to convert "" into an Enum
+const cleanParams = (params) => {
+  if (!params) return {};
+  return Object.fromEntries(
+    Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== "")
+  );
+};
+
+// ─── Existing exports (unchanged signatures so CreateTicketPage & co still work) ───
 export const createTicket = (ticketData) => ticketApi.post(`/tickets`, ticketData);
 
 export const uploadAttachments = (ticketId, files) => {
@@ -25,35 +37,26 @@ export const uploadAttachments = (ticketId, files) => {
   });
 };
 
-export const getMyTickets = (filters = {}) => {
-  const params = new URLSearchParams();
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      params.append(key, value);
-    }
-  });
-  return ticketApi.get(`/tickets/my?${params.toString()}`);
-};
+export const getMyTickets = (filters = {}) => 
+  ticketApi.get(`/tickets/my`, { params: cleanParams(filters) });
 
 export const getTicketById = (ticketId) => ticketApi.get(`/tickets/${ticketId}`);
 
-export const updateTicketStatus = (ticketId, data) => ticketApi.patch(`/tickets/${ticketId}/status`, data);
+export const updateTicketStatus = (ticketId, data) => 
+  ticketApi.patch(`/tickets/${ticketId}/status`, data);
 
-export const assignTechnician = (ticketId, data) => ticketApi.patch(`/tickets/${ticketId}/assign`, data);
+export const assignTechnician = (ticketId, data) => 
+  ticketApi.patch(`/tickets/${ticketId}/assign`, data);
 
-// Chunk 11 exports
-export const getAllTickets = (filters = {}) => {
-  const params = new URLSearchParams();
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      params.append(key, value);
-    }
-  });
-  return ticketApi.get(`/tickets?${params.toString()}`);
-};
+export const getAllTickets = (filters = {}) => 
+  ticketApi.get(`/tickets`, { params: cleanParams(filters) });
 
 export const getTicketAnalytics = () => ticketApi.get(`/tickets/analytics`);
 
-export const getTicketsByResource = (resourceId) => ticketApi.get(`/tickets/resource/${resourceId}`);
+export const getTicketsByResource = (resourceId) => 
+  ticketApi.get(`/tickets/resource/${resourceId}`);
+
+// ─── New exports ───
+export const getTechnicians = () => ticketApi.get(`/tickets/technicians`);
 
 export default ticketApi;
