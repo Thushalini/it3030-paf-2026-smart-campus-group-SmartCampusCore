@@ -8,7 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.Optional;
 import java.util.List;
+
 public interface TicketRepository extends MongoRepository<Ticket, String> {
     Page<Ticket> findByReportedByIdOrderByCreatedAtDesc(String reportedById, Pageable pageable);
     Page<Ticket> findByAssignedToIdAndStatusIn(String techId, List<TicketStatus> statuses, Pageable pageable);
@@ -19,4 +21,5 @@ public interface TicketRepository extends MongoRepository<Ticket, String> {
     Long countByCategory(TicketCategory category);
     Page<Ticket> findByStatusAndPriorityOrderByCreatedAtAsc(TicketStatus status, TicketPriority priority, Pageable pageable);
     Boolean existsByResourceIdAndStatusIn(String resourceId, List<TicketStatus> statuses);
+    Optional<Ticket> findFirstByTicketNumberStartingWithOrderByTicketNumberDesc(String prefix);
 }

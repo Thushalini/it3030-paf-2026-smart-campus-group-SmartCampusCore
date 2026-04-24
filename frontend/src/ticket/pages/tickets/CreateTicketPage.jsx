@@ -1,15 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import TicketForm from "../../components/tickets/TicketForm";
 import { createTicket, uploadAttachments } from "../../api/ticketApi";
+import { getCurrentUser } from "../../hooks/useAuth"; // ← add this
 import "./CreateTicketPage.css";
 
 export default function CreateTicketPage() {
   const navigate = useNavigate();
+  const currentUser = getCurrentUser(); // ← read once
 
   const handleSubmit = async (ticketData, files) => {
     try {
       const res = await createTicket(ticketData);
-      const ticketId = res.data?.data?.id || res.data?.data?._id; // handle both id formats
+      const ticketId = res.data?.data?.id || res.data?.data?._id;
       
       if (!ticketId) {
         console.error("No ticket ID in response", res.data);
@@ -42,7 +44,11 @@ export default function CreateTicketPage() {
           <p>Report a facility issue and we'll get it resolved quickly.</p>
         </div>
 
-        <TicketForm onSubmit={handleSubmit} loading={false} />
+        <TicketForm
+          onSubmit={handleSubmit}
+          loading={false}
+          defaultContactEmail={currentUser?.email || ""}
+        />
       </div>
     </div>
   );

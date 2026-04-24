@@ -3,8 +3,38 @@ import ImageUploader from "./ImageUploader";
 import ticketApi from "../../api/ticketApi";
 import "./TicketForm.css";
 
-export default function TicketForm({ onSubmit, loading, initialValues }) {
-  const [formData, setFormData] = useState({ contactDetails: {}, ...initialValues });
+/**
+ * TicketForm – create or edit a ticket.
+ *
+ * @param {Function} onSubmit      – called with (formData, files) when form is submitted.
+ * @param {boolean} loading        – disables submit button while true.
+ * @param {Object}  initialValues  – optional initial form data (e.g. for editing).
+ * @param {string}  defaultContactName  – optional, pre‑fills the "Contact Name" field.
+ * @param {string}  defaultContactEmail – optional, pre‑fills the "Email" field.
+ */
+export default function TicketForm({
+  onSubmit,
+  loading,
+  initialValues,
+  defaultContactName = "",   // ← NEW prop
+  defaultContactEmail = "",  // ← NEW prop
+}) {
+  // Initialize formData – merge initialValues with default contact details
+  const [formData, setFormData] = useState(() => {
+    const base = { contactDetails: {}, ...initialValues };
+    // If initialValues already provides contactDetails, keep them, otherwise start empty.
+    const contact = base.contactDetails || {};
+    return {
+      ...base,
+      contactDetails: {
+        contactName: defaultContactName || contact.contactName || "",
+        email: defaultContactEmail || contact.email || "",
+        phone: contact.phone || "",
+        preferredMethod: contact.preferredMethod || "",
+      },
+    };
+  });
+
   const [files, setFiles] = useState([]);
   const [resources, setResources] = useState([]);
   const [resourceError, setResourceError] = useState(null);
@@ -37,14 +67,22 @@ export default function TicketForm({ onSubmit, loading, initialValues }) {
 
       <div className="field field-full">
         <label>Ticket Title</label>
-        <input type="text" name="title" placeholder="e.g., Flickering light in Lab 2" required
+        <input
+          type="text"
+          name="title"
+          placeholder="e.g., Flickering light in Lab 2"
+          required
           value={formData.title || ""}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+        />
       </div>
 
       <div className="field">
         <label>Facility / Resource</label>
-        <select name="resourceId" required value={formData.resourceId || ""}
+        <select
+          name="resourceId"
+          required
+          value={formData.resourceId || ""}
           onChange={(e) => {
             const selected = resources.find((r) => r._id === e.target.value);
             if (selected) {
@@ -52,29 +90,46 @@ export default function TicketForm({ onSubmit, loading, initialValues }) {
                 ...formData,
                 resourceId: selected._id,
                 resourceName: selected.name,
-                location: `${selected.location}, ${selected.building}, Floor ${selected.floor}, Room ${selected.roomNumber}`
+                location: `${selected.location}, ${selected.building}, Floor ${selected.floor}, Room ${selected.roomNumber}`,
               });
             } else {
               setFormData({ ...formData, resourceId: "", resourceName: "", location: "" });
             }
-          }}>
+          }}
+        >
           <option value="">{resourceError || "Select Resource"}</option>
           {resources.map((r) => (
-            <option key={r._id} value={r._id}>{r.name} ({r.location})</option>
+            <option key={r._id} value={r._id}>
+              {r.name} ({r.location})
+            </option>
           ))}
         </select>
-        {resourceError && <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.25rem" }}>{resourceError}</p>}
+        {resourceError && (
+          <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.25rem" }}>
+            {resourceError}
+          </p>
+        )}
       </div>
 
       <div className="field">
         <label>Auto-detected Location</label>
-        <input type="text" name="location" placeholder="Resource Location" value={formData.location || ""} readOnly />
+        <input
+          type="text"
+          name="location"
+          placeholder="Resource Location"
+          value={formData.location || ""}
+          readOnly
+        />
       </div>
 
       <div className="field">
         <label>Category</label>
-        <select name="category" required value={formData.category || ""}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
+        <select
+          name="category"
+          required
+          value={formData.category || ""}
+          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+        >
           <option value="">Select Category</option>
           <option value="ELECTRICAL">Electrical</option>
           <option value="PLUMBING">Plumbing</option>
@@ -88,8 +143,12 @@ export default function TicketForm({ onSubmit, loading, initialValues }) {
 
       <div className="field">
         <label>Priority Level</label>
-        <select name="priority" required value={formData.priority || ""}
-          onChange={(e) => setFormData({ ...formData, priority: e.target.value })}>
+        <select
+          name="priority"
+          required
+          value={formData.priority || ""}
+          onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+        >
           <option value="">Select Priority</option>
           <option value="LOW">Low</option>
           <option value="MEDIUM">Medium</option>
@@ -100,38 +159,95 @@ export default function TicketForm({ onSubmit, loading, initialValues }) {
 
       <div className="field field-full">
         <label>Description</label>
-        <textarea name="description" placeholder="Describe the issue in detail..." required maxLength={1000}
+        <textarea
+          name="description"
+          placeholder="Describe the issue in detail..."
+          required
+          maxLength={1000}
           value={formData.description || ""}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+        />
       </div>
 
       <div className="form-section">Contact Information</div>
 
       <div className="field">
         <label>Contact Name</label>
-        <input type="text" name="contactName" placeholder="Your name" required
+        <input
+          type="text"
+          name="contactName"
+          placeholder="Your name"
+          required
           value={formData.contactDetails?.contactName || ""}
-          onChange={(e) => setFormData({ ...formData, contactDetails: { ...(formData.contactDetails || {}), contactName: e.target.value } })} />
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              contactDetails: {
+                ...(formData.contactDetails || {}),
+                contactName: e.target.value,
+              },
+            })
+          }
+        />
       </div>
 
       <div className="field">
         <label>Email</label>
-        <input type="email" name="email" placeholder="you@my.uni.lk" required
+        <input
+          type="email"
+          name="email"
+          placeholder="you@my.uni.lk"
+          required
           value={formData.contactDetails?.email || ""}
-          onChange={(e) => setFormData({ ...formData, contactDetails: { ...(formData.contactDetails || {}), email: e.target.value } })} />
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              contactDetails: {
+                ...(formData.contactDetails || {}),
+                email: e.target.value,
+              },
+            })
+          }
+        />
       </div>
 
       <div className="field">
-        <label>Phone <span style={{ fontWeight: 400, color: "#94a3b8" }}>(optional)</span></label>
-        <input type="text" name="phone" placeholder="Phone number"
+        <label>
+          Phone <span style={{ fontWeight: 400, color: "#94a3b8" }}>(optional)</span>
+        </label>
+        <input
+          type="text"
+          name="phone"
+          placeholder="Phone number"
           value={formData.contactDetails?.phone || ""}
-          onChange={(e) => setFormData({ ...formData, contactDetails: { ...(formData.contactDetails || {}), phone: e.target.value } })} />
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              contactDetails: {
+                ...(formData.contactDetails || {}),
+                phone: e.target.value,
+              },
+            })
+          }
+        />
       </div>
 
       <div className="field">
         <label>Preferred Contact Method</label>
-        <select name="preferredMethod" required value={formData.contactDetails?.preferredMethod || ""}
-          onChange={(e) => setFormData({ ...formData, contactDetails: { ...(formData.contactDetails || {}), preferredMethod: e.target.value } })}>
+        <select
+          name="preferredMethod"
+          required
+          value={formData.contactDetails?.preferredMethod || ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              contactDetails: {
+                ...(formData.contactDetails || {}),
+                preferredMethod: e.target.value,
+              },
+            })
+          }
+        >
           <option value="">Select Method</option>
           <option value="EMAIL">Email</option>
           <option value="PHONE">Phone</option>

@@ -1,7 +1,6 @@
 package com.sliit.campus_core.ticket.service.impl;
 
 import com.sliit.campus_core.dto.NotificationRequestDTO;
-import com.sliit.campus_core.entity.User;
 import com.sliit.campus_core.repository.UserRepository;
 import com.sliit.campus_core.service.NotificationService;
 import com.sliit.campus_core.ticket.service.NotificationPublisher;

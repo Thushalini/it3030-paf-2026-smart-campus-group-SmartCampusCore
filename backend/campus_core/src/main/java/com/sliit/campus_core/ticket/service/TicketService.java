@@ -32,9 +32,12 @@ public interface TicketService {
                                          String changedByName,
                                          String changedByRole);
 
+    // CHANGE: Added adminName and adminRole for history logging on auto-transition
     TicketResponseDTO assignTechnician(String ticketId,
                                        TicketAssignRequestDTO dto,
-                                       String adminId);
+                                       String adminId,
+                                       String adminName,
+                                       String adminRole);
     
     Page<TicketResponseDTO> getAllTickets(TicketFilterRequestDTO filter,
                                       String currentUserId,
