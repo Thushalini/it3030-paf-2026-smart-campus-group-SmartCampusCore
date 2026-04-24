@@ -46,15 +46,18 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
+    private final NotificationService notificationService;
 
     public BookingService(
             BookingRepository bookingRepository,
             UserRepository userRepository,
-            ResourceRepository resourceRepository
+            ResourceRepository resourceRepository,
+            NotificationService notificationService
     ) {
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
         this.resourceRepository = resourceRepository;
+        this.notificationService = notificationService;
     }
 
     public BookingResponse createBooking(BookingRequest request, String userEmail) {
@@ -123,6 +126,13 @@ public class BookingService {
         booking.setQrCode(generateQRCode(booking));
 
         booking = bookingRepository.save(booking);
+
+        notificationService.sendNotification(
+            booking.getUser(),
+            "Your booking for " + booking.getResource().getName() + " has been approved.",
+            "BOOKING"
+        );
+
         return convertToBookingResponse(booking);
     }
 
@@ -138,6 +148,13 @@ public class BookingService {
         booking.setRejectionReason(request.getReason());
 
         booking = bookingRepository.save(booking);
+
+        notificationService.sendNotification(
+            booking.getUser(),
+            "Your booking for " + booking.getResource().getName() + " was rejected. Reason: " + request.getReason(),
+            "BOOKING"
+        );
+
         return convertToBookingResponse(booking);
     }
 
@@ -159,6 +176,13 @@ public class BookingService {
         booking.setStatus(BookingStatus.CANCELLED);
 
         booking = bookingRepository.save(booking);
+
+        notificationService.sendNotification(
+            booking.getUser(),
+            "Your booking for " + booking.getResource().getName() + " has been cancelled.",
+            "BOOKING"
+        );
+
         return convertToBookingResponse(booking);
     }
 

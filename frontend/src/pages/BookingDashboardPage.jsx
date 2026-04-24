@@ -187,7 +187,7 @@ const BookingDashboardPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -225,7 +225,7 @@ const BookingDashboardPage = () => {
               name="status"
               value={filters.status}
               onChange={handleFilterChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             >
               <option value="">All Status</option>
               <option value="PENDING">Pending</option>
@@ -245,7 +245,7 @@ const BookingDashboardPage = () => {
               name="date"
               value={filters.date}
               onChange={handleFilterChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
 
@@ -258,7 +258,7 @@ const BookingDashboardPage = () => {
               name="resourceId"
               value={filters.resourceId}
               onChange={handleFilterChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             >
               <option value="">All Resources</option>
               {resources.map((resource) => (
@@ -272,7 +272,7 @@ const BookingDashboardPage = () => {
           <div className="flex items-end">
             <button
               onClick={applyFilters}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
             >
               <Search className="h-4 w-4 mr-2" />
               Apply Filters
@@ -299,7 +299,7 @@ const BookingDashboardPage = () => {
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-primary-600 truncate">
+                          <p className="text-sm font-medium text-blue-600 truncate">
                             {booking.resourceName}
                           </p>
                           <p className="text-sm text-gray-500">
@@ -414,7 +414,7 @@ const BookingDashboardPage = () => {
                       value={rejectionReason}
                       onChange={(e) => setRejectionReason(e.target.value)}
                       rows={4}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       placeholder="Please provide a reason for rejecting this booking..."
                     />
                   </div>
