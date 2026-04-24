@@ -1,8 +1,8 @@
 package com.sliit.campus_core.dto;
 
-import java.time.LocalTime;
-
 import com.sliit.campus_core.entity.ResourceStatus;
+
+import java.time.LocalTime;
 
 public class ResourceResponse {
 
