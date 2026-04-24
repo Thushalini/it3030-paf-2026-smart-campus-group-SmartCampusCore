@@ -32,7 +32,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,6 @@ import java.util.List;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
-    private final AtomicInteger sequence = new AtomicInteger(1);
 
     @Autowired
     private TicketStatusHistoryRepository ticketStatusHistoryRepository;
@@ -76,8 +74,25 @@ public class TicketServiceImpl implements TicketService {
         ticket.setReportedByName(reportedByName);
         ticket.setReportedByEmail(reportedByEmail);
 
-        String ticketNumber = "TKT-" + Year.now().getValue() + "-" +
-                String.format("%04d", sequence.getAndIncrement());
+        String year = String.valueOf(Year.now().getValue());
+        String prefix = "TKT-" + year + "-";
+
+        // Query DB for the highest ticket number this year
+        Optional<Ticket> lastTicket = ticketRepository
+                .findFirstByTicketNumberStartingWithOrderByTicketNumberDesc(prefix);
+
+        int nextSeq = 1;
+        if (lastTicket.isPresent()) {
+            String lastNum = lastTicket.get().getTicketNumber();
+            try {
+                String seqPart = lastNum.substring(lastNum.lastIndexOf('-') + 1);
+                nextSeq = Integer.parseInt(seqPart) + 1;
+            } catch (Exception e) {
+                nextSeq = 1; // fallback
+            }
+        }
+
+        String ticketNumber = prefix + String.format("%04d", nextSeq);
         ticket.setTicketNumber(ticketNumber);
 
         ticket.setStatus(TicketStatus.OPEN);
