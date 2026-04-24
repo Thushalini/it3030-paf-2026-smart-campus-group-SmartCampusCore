@@ -1,5 +1,21 @@
 package com.sliit.campus_core.ticket.service.impl;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.sliit.campus_core.dto.NotificationRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketAnalyticsDTO;
 import com.sliit.campus_core.dto.ticket.TicketAssignRequestDTO;
@@ -7,6 +23,10 @@ import com.sliit.campus_core.dto.ticket.TicketCreateRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketFilterRequestDTO;
 import com.sliit.campus_core.dto.ticket.TicketResponseDTO;
 import com.sliit.campus_core.dto.ticket.TicketUpdateStatusRequestDTO;
+import com.sliit.campus_core.ticket.exception.InvalidStatusTransitionException;
+import com.sliit.campus_core.ticket.exception.MaxAttachmentsExceededException;
+import com.sliit.campus_core.ticket.exception.TicketNotFoundException;
+import com.sliit.campus_core.ticket.mapper.TicketMapper;
 import com.sliit.campus_core.ticket.model.Ticket;
 import com.sliit.campus_core.ticket.model.TicketStatusHistory;
 import com.sliit.campus_core.ticket.model.enums.TicketCategory;
@@ -14,27 +34,8 @@ import com.sliit.campus_core.ticket.model.enums.TicketPriority;
 import com.sliit.campus_core.ticket.model.enums.TicketStatus;
 import com.sliit.campus_core.ticket.repository.TicketRepository;
 import com.sliit.campus_core.ticket.repository.TicketStatusHistoryRepository;
-import com.sliit.campus_core.ticket.mapper.TicketMapper;
 import com.sliit.campus_core.ticket.service.NotificationPublisher;
 import com.sliit.campus_core.ticket.service.TicketService;
-import com.sliit.campus_core.ticket.exception.InvalidStatusTransitionException;
-import com.sliit.campus_core.ticket.exception.MaxAttachmentsExceededException;
-import com.sliit.campus_core.ticket.exception.TicketNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.time.Year;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Optional;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -160,16 +161,23 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Page<TicketResponseDTO> getMyTickets(TicketFilterRequestDTO filter, Pageable pageable) {
-        Page<Ticket> page = ticketRepository.findByReportedByIdOrderByCreatedAtDesc(filter.getReportedById(), pageable);
+        // Fix for line 163: cast reportedById from Object to String
+        String reportedById = (String) filter.getReportedById();
+        Page<Ticket> page = ticketRepository.findByReportedByIdOrderByCreatedAtDesc(reportedById, pageable);
 
         List<TicketResponseDTO> filtered = page.stream()
             .filter(t -> filter.getStatus() == null || t.getStatus() == filter.getStatus())
             .filter(t -> filter.getPriority() == null || t.getPriority() == filter.getPriority())
             .filter(t -> filter.getCategory() == null || t.getCategory() == filter.getCategory())
             .filter(t -> filter.getResourceId() == null || t.getResourceId().equals(filter.getResourceId()))
-            .filter(t -> filter.getSearch() == null 
-                || t.getTitle().toLowerCase().contains(filter.getSearch().toLowerCase()) 
-                || t.getDescription().toLowerCase().contains(filter.getSearch().toLowerCase()))
+            // Fix for lines 171-172: handle search as Object and cast to String
+            .filter(t -> {
+                Object searchObj = filter.getSearch();
+                if (searchObj == null) return true;
+                String searchLower = searchObj.toString().toLowerCase();
+                return t.getTitle().toLowerCase().contains(searchLower) 
+                    || t.getDescription().toLowerCase().contains(searchLower);
+            })
             .map(ticketMapper::toResponseDTO)
             .toList();
 
@@ -363,5 +371,4 @@ public class TicketServiceImpl implements TicketService {
         return ticketRepository.findByResourceId(resourceId, pageable)
                 .map(ticketMapper::toResponseDTO);
     }
-
 }
