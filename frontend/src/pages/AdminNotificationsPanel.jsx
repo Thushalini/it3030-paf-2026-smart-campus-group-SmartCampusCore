@@ -11,7 +11,7 @@ import AdminNotificationAnalytics from "./AdminNotificationAnalytics";
 
 const ROLES        = ["ALL", "TECHNICIAN", "USER", "ADMIN"];
 const TYPES        = ["ANNOUNCEMENT", "BOOKING", "TICKET", "COMMENT"];
-const FILTER_TYPES = ["ALL", "BOOKING", "TICKET", "COMMENT"];
+const FILTER_TYPES = ["ALL", "ANNOUNCEMENT", "BOOKING", "TICKET", "COMMENT"];
 
 export default function AdminNotificationsPanel() {
   const [tab, setTab]               = useState("send");   // "send" | "inbox" | "analytics"
@@ -110,6 +110,26 @@ export default function AdminNotificationsPanel() {
             {label}
           </button>
         ))}
+      </div>
+
+      {/* SUMMARY CARDS */}
+      <div className="grid grid-cols-4 gap-4">
+        <div className="bg-white py-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+          <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Total Notifications</h4>
+          <p className="text-3xl font-bold text-gray-800 mt-1">{allNotifs.length}</p>
+        </div>
+        <div className="bg-white py-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+          <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Unread</h4>
+          <p className="text-3xl font-bold text-blue-600 mt-1">{allNotifs.filter(n => !n.isRead).length}</p>
+        </div>
+        <div className="bg-white py-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+          <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Read</h4>
+          <p className="text-3xl font-bold text-gray-800 mt-1">{allNotifs.filter(n => n.isRead).length}</p>
+        </div>
+        <div className="bg-white py-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+          <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Broadcasts Sent</h4>
+          <p className="text-3xl font-bold text-green-600 mt-1">{history.length}</p>
+        </div>
       </div>
 
       {/* ══════════════════ TAB: Send ══════════════════ */}

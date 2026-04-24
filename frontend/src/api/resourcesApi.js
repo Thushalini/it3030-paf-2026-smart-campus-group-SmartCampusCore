@@ -7,7 +7,7 @@ const API = axios.create({
 // ✅ Attach JWT token to every request automatically
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token"); // make sure key matches what you store on login
+    const token = sessionStorage.getItem("token"); // make sure key matches what you store on login
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,10 +25,12 @@ export const getResourceAnalytics = (params) => API.get("/resources/analytics", 
 
 export const uploadResourceImages = (files) => {
   const formData = new FormData();
+
   (files || []).forEach((file) => {
     formData.append("files", file);
   });
-  return API.post("admin/resources/upload-images", formData, {
+
+  return API.post("/resources/upload-images", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };

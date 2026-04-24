@@ -1,31 +1,10 @@
 package com.sliit.campus_core.ticket.controller;
 
-import com.sliit.campus_core.dto.ApiResponse;
-import com.sliit.campus_core.dto.ticket.TicketAnalyticsDTO;
-import com.sliit.campus_core.dto.ticket.TicketAssignRequestDTO;
-import com.sliit.campus_core.dto.ticket.TicketCreateRequestDTO;
-import com.sliit.campus_core.dto.ticket.TicketFilterRequestDTO;
-import com.sliit.campus_core.dto.ticket.TicketResponseDTO;
-import com.sliit.campus_core.dto.ticket.TicketUpdateStatusRequestDTO;
-import com.sliit.campus_core.ticket.exception.MaxAttachmentsExceededException;
-import com.sliit.campus_core.ticket.model.enums.TicketCategory;
-import com.sliit.campus_core.ticket.model.enums.TicketPriority;
-import com.sliit.campus_core.ticket.model.enums.TicketStatus;
-import com.sliit.campus_core.ticket.service.FileStorageService;
-import com.sliit.campus_core.ticket.service.TicketService;
-import com.sliit.campus_core.entity.User;
-import com.sliit.campus_core.repository.UserRepository;
-import jakarta.validation.Valid;
-import com.sliit.campus_core.entity.Role;  // adjust package if different
-import java.util.stream.Collectors;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.Part;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,9 +14,40 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;  // adjust package if different
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.sliit.campus_core.dto.ApiResponse;
+import com.sliit.campus_core.dto.ticket.TicketAnalyticsDTO;
+import com.sliit.campus_core.dto.ticket.TicketAssignRequestDTO;
+import com.sliit.campus_core.dto.ticket.TicketCreateRequestDTO;
+import com.sliit.campus_core.dto.ticket.TicketFilterRequestDTO;
+import com.sliit.campus_core.dto.ticket.TicketResponseDTO;
+import com.sliit.campus_core.dto.ticket.TicketUpdateStatusRequestDTO;
+import com.sliit.campus_core.entity.Role;
+import com.sliit.campus_core.entity.User;
+import com.sliit.campus_core.repository.UserRepository;
+import com.sliit.campus_core.ticket.exception.MaxAttachmentsExceededException;
+import com.sliit.campus_core.ticket.model.enums.TicketCategory;
+import com.sliit.campus_core.ticket.model.enums.TicketPriority;
+import com.sliit.campus_core.ticket.model.enums.TicketStatus;
+import com.sliit.campus_core.ticket.service.FileStorageService;
+import com.sliit.campus_core.ticket.service.TicketService;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/tickets")

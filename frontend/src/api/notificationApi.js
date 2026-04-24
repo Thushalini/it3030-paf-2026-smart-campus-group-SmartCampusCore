@@ -4,7 +4,7 @@ const API_URL = "http://localhost:8080/api/notifications";
 
 const getAuthHeader = () => ({
   headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
+    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
   },
 });
 

@@ -18,7 +18,7 @@ function AdminManageUsers() {
   const [activeTab, setActiveTab] = useState("users");
 
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   const fetchUsers = async () => {
     try {
@@ -125,6 +125,26 @@ function AdminManageUsers() {
         {/* ── USERS TAB ── */}
         {activeTab === "users" && (
           <>
+            {/* SUMMARY CARDS */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="bg-white py-4 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+                <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Total Active Users</h4>
+                <p className="text-3xl font-bold text-gray-800 mt-1">{users.length}</p>
+              </div>
+              <div className="bg-white py-4 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+                <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Admins</h4>
+                <p className="text-3xl font-bold text-blue-600 mt-1">{users.filter(u => u.role === "ADMIN").length}</p>
+              </div>
+              <div className="bg-white py-4 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+                <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Technicians</h4>
+                <p className="text-3xl font-bold text-orange-500 mt-1">{users.filter(u => u.role === "TECHNICIAN").length}</p>
+              </div>
+              <div className="bg-white py-4 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+                <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider">Standard Users</h4>
+                <p className="text-3xl font-bold text-gray-800 mt-1">{users.filter(u => u.role === "USER").length}</p>
+              </div>
+            </div>
+
             {/* FILTERS */}
             <div className="flex gap-3 mb-4">
               <input

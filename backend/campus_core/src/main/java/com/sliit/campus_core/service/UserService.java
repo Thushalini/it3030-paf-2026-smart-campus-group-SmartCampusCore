@@ -154,6 +154,26 @@ public class UserService {
         user.setPhone(updated.getPhone());
         user.setDepartment(updated.getDepartment());
 
+        // 🔹 User type logic
+        if (updated.getUserType() != null) {
+            user.setUserType(updated.getUserType());
+
+            if (updated.getUserType() == UserType.STUDENT) {
+                if (updated.getStudentId() == null || updated.getStudentId().trim().isEmpty()) {
+                    throw new RuntimeException("Student ID required");
+                }
+                user.setStudentId(updated.getStudentId());
+                user.setStaffId(null);
+            } 
+            else if (updated.getUserType() == UserType.STAFF) {
+                if (updated.getStaffId() == null || updated.getStaffId().trim().isEmpty()) {
+                    throw new RuntimeException("Staff ID required");
+                }
+                user.setStaffId(updated.getStaffId());
+                user.setStudentId(null);
+            }
+        }
+
         // optional
         user.setBookingNotifications(updated.isBookingNotifications());
         user.setTicketNotifications(updated.isTicketNotifications());

@@ -120,7 +120,7 @@ public class ResourceService {
 
         validateRequest(request.getName(), request.getResourceCode(), request.getType() != null, request.getCapacity(), request.getLocation(), request.getStatus() != null);
 
-        if (!existing.getResourceCode().equals(request.getResourceCode())
+        if (!Objects.equals(existing.getResourceCode(), request.getResourceCode())
                 && resourceRepository.existsByResourceCode(request.getResourceCode())) {
             throw new BadRequestException("Resource code already exists");
         }

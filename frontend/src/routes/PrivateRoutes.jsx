@@ -6,7 +6,7 @@ const PrivateRoute = ({ children, allowedRoles }) => {
   const { user } = useContext(AuthContext);
   const location = useLocation();
 
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   // ⏳ Still loading user (important for refresh handling)
   if (user === undefined) {

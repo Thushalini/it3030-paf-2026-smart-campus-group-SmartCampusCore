@@ -1,18 +1,19 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import api from "../api/axiosConfig";
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+export const useAuth = () => useContext(AuthContext);
 
-  // Load user on app start
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(undefined);
+
   useEffect(() => {
     initAuth();
   }, []);
 
   const initAuth = async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
       setUser(null);
@@ -23,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       const res = await api.get("/api/auth/me");
       setUser(res.data);
     } catch (err) {
-      console.error("Session expired");
+      console.error("Session expired", err);
       logout();
     }
   };
@@ -34,98 +35,25 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    localStorage.setItem("token", data.token);
+    sessionStorage.setItem("token", data.token);
 
     try {
       const res = await api.get("/api/auth/me");
       setUser(res.data);
     } catch (err) {
+      console.error("Failed to load user after login", err);
       logout();
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-// import { createContext, useState, useEffect } from "react";
-// import axios from "axios";
-
-// export const AuthContext = createContext();
-
-// export const AuthProvider = ({ children }) => {
-//   const [user, setUser] = useState(undefined); // undefined = loading
-
-//   // 🔥 Load user from backend using token
-//   useEffect(() => {
-//     const token = localStorage.getItem("token");
-
-//     if (!token) {
-//       setUser(null);
-//       return;
-//     }
-
-//     axios
-//       .get("http://localhost:8080/api/auth/me", {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       })
-//       .then((res) => {
-//         setUser(res.data); // { id, email, role, name }
-//       })
-//       .catch((err) => {
-//         console.error("Invalid token:", err);
-//         logout();
-//       });
-//   }, []);
-
-//   // ✅ Login (Normal + Google)
-//   const login = (data) => {
-//     localStorage.setItem("token", data.token);
-
-//     // If backend sends user → use it
-//     if (data.user) {
-//       setUser(data.user);
-//     } else {
-//       fetchUser();
-//     }
-//   };
-
-//   // 🔄 Fetch user manually
-//   const fetchUser = async () => {
-//     const token = localStorage.getItem("token");
-
-//     try {
-//       const res = await axios.get("http://localhost:8080/api/auth/me", {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-
-//       setUser(res.data);
-//     } catch (err) {
-//       logout();
-//     }
-//   };
-
-//   // 🚪 Logout
-//   const logout = () => {
-//     localStorage.removeItem("token");
-//     setUser(null);
-//   };
-
-//   return (
-//     <AuthContext.Provider value={{ user, login, logout }}>
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// };

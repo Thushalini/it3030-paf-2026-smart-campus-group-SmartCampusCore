@@ -154,9 +154,7 @@ public class AdminNotificationController {
 
         List<Notification> all = notificationRepository.findAll(
             Sort.by(Sort.Direction.DESC, "createdAt")
-        ).stream()
-        .filter(n -> !"ANNOUNCEMENT".equalsIgnoreCase(n.getType()))
-        .collect(Collectors.toList());
+        );
 
         if (type != null && !type.isBlank()) {
             all = all.stream()

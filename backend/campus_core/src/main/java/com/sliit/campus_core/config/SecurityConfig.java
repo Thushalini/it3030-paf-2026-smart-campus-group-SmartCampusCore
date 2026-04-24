@@ -1,5 +1,7 @@
 package com.sliit.campus_core.config;
 
+import java.util.List;
+
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +21,6 @@ import com.sliit.campus_core.security.JwtFilter;
 import com.sliit.campus_core.security.OAuth2LoginSuccessHandler;
 
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -49,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -68,7 +69,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 3. Explicitly allow pre-flight OPTIONS requests for all endpoints
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                
                 // --- Your existing team routes (DO NOT REMOVE) ---
                 .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/google", "/oauth2/**").permitAll()
                 .requestMatchers("/favicon.ico", "/static/**", "/assets/**", "/uploads/**").permitAll()

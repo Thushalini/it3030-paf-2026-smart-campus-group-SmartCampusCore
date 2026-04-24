@@ -1,6 +1,7 @@
 package com.sliit.campus_core.entity;
 
 import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,10 @@ public class Resource {
     private String floor;
     private String roomNumber;
     private String availabilityWindow;
+
+    private LocalTime startTime;
+    private LocalTime endTime;
+
     private ResourceStatus status;
     private List<String> features;
     private List<String> imageUrls;
@@ -129,6 +134,22 @@ public class Resource {
         this.availabilityWindow = availabilityWindow;
     }
 
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
     public ResourceStatus getStatus() {
         return status;
     }
@@ -198,6 +219,4 @@ public class Resource {
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
- 
 }
-
