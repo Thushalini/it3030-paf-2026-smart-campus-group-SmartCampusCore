@@ -78,10 +78,8 @@ export default function Profile() {
         className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden"
       >
 
-        {/* TOP BANNER */}
         <div className="h-28 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
 
-        {/* Avatar */}
         <div className="flex flex-col items-center -mt-16">
           <label className="cursor-pointer relative group">
             <motion.img
