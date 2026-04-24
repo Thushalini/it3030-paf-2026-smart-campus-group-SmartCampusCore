@@ -7,7 +7,7 @@ export default function Profile() {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const API = "http://localhost:8080/api/profile";
 
   useEffect(() => { fetchProfile(); }, []);
@@ -43,6 +43,28 @@ export default function Profile() {
     fetchProfile();
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      await axios.post(`${API}/upload-pic`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      fetchProfile();
+      alert("Profile picture updated!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload image");
+    }
+  };
+
   if (loading) return <p className="text-center mt-10">Loading...</p>;
   if (!user) return <p className="text-center mt-10">No user found</p>;
 
@@ -61,15 +83,21 @@ export default function Profile() {
 
         {/* Avatar */}
         <div className="flex flex-col items-center -mt-16">
-          <motion.img
-            whileHover={{ scale: 3.00 }}
-            src={
-              user.profileImage?.trim()
-                ? `http://localhost:8080${user.profileImage}`
-                : `https://ui-avatars.com/api/?name=${user.name}`
-            }
-            className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg object-cover transition-opacity"
-          />
+          <label className="cursor-pointer relative group">
+            <motion.img
+              whileHover={{ scale: 1.05 }}
+              src={
+                user.profileImage?.trim()
+                  ? `http://localhost:8080/${user.profileImage.replace(/^\/+/, '')}`
+                  : `https://ui-avatars.com/api/?name=${user.name}`
+              }
+              className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg transition-opacity group-hover:opacity-80"
+            />
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-white bg-black bg-opacity-50 px-2 py-1 rounded text-xs font-semibold">Change</span>
+            </div>
+            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+          </label>
 
           <h2 className="mt-4 text-xl font-semibold">{user.name}</h2>
           <p className="text-gray-500 text-sm">{user.email}</p>

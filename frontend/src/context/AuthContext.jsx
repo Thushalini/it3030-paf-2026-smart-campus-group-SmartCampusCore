@@ -1,10 +1,12 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import api from "../api/axiosConfig";
 
 export const AuthContext = createContext();
 
+export const useAuth = () => useContext(AuthContext);
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined);
 
   // Load user on app start
   useEffect(() => {
@@ -12,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const initAuth = async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
       setUser(null);
@@ -34,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    localStorage.setItem("token", data.token);
+    sessionStorage.setItem("token", data.token);
 
     try {
       const res = await api.get("/api/auth/me");
@@ -45,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     setUser(null);
   };
 
@@ -66,7 +68,7 @@ export const AuthProvider = ({ children }) => {
 
 //   // 🔥 Load user from backend using token
 //   useEffect(() => {
-//     const token = localStorage.getItem("token");
+//     const token = sessionStorage.getItem("token");
 
 //     if (!token) {
 //       setUser(null);
@@ -90,7 +92,7 @@ export const AuthProvider = ({ children }) => {
 
 //   // ✅ Login (Normal + Google)
 //   const login = (data) => {
-//     localStorage.setItem("token", data.token);
+//     sessionStorage.setItem("token", data.token);
 
 //     // If backend sends user → use it
 //     if (data.user) {
@@ -102,7 +104,7 @@ export const AuthProvider = ({ children }) => {
 
 //   // 🔄 Fetch user manually
 //   const fetchUser = async () => {
-//     const token = localStorage.getItem("token");
+//     const token = sessionStorage.getItem("token");
 
 //     try {
 //       const res = await axios.get("http://localhost:8080/api/auth/me", {
@@ -119,7 +121,7 @@ export const AuthProvider = ({ children }) => {
 
 //   // 🚪 Logout
 //   const logout = () => {
-//     localStorage.removeItem("token");
+//     sessionStorage.removeItem("token");
 //     setUser(null);
 //   };
 

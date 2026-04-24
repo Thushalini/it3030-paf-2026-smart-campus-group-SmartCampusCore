@@ -84,8 +84,8 @@ export default function NotificationBell() {
 
     const interval = setInterval(loadUnreadCount, 5000);
 
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
+    const token = sessionStorage.getItem("token");
+    const userId = sessionStorage.getItem("userId");
 
     const stompClient = new Client({
       webSocketFactory: () => new SockJS("http://localhost:8080/ws"),

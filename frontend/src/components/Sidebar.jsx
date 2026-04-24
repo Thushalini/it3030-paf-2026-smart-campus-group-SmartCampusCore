@@ -23,6 +23,8 @@ const Sidebar = () => {
       background: "#1e3a8a",
       color: "white",
       padding: "20px",
+      overflowY: "auto",
+      flexShrink: 0,
     }}>
       <h2 style={{ marginBottom: "24px" }}>Smart Campus</h2>
 
@@ -33,7 +35,7 @@ const Sidebar = () => {
           <>
             <li><Link to="/user" style={linkStyle("/user")}>👤 My Profile</Link></li>
             <li><Link to="/user/resources" style={linkStyle("/user/resources")}>📦 Resources</Link></li>
-            <li><Link to="/bookings" style={linkStyle("/bookings")}>📅 My Bookings</Link></li>
+            <li><Link to="/user/bookings" style={linkStyle("/user/bookings")}>📅 My Bookings</Link></li>
             <li><Link to="/tickets/my" style={linkStyle("/tickets/my")}>🎫 My Tickets</Link></li>
             <li><Link to="/tickets/create" style={linkStyle("/tickets/create")}>➕ Raise Ticket</Link></li>
           </>
@@ -67,6 +69,12 @@ const Sidebar = () => {
             <li><Link to="/admin/resources" style={linkStyle("/admin/resources")}>🗂️ Manage Resources</Link></li>
             <li><Link to="/admin/resources/new" style={linkStyle("/admin/resources/new")}>➕ Add New Resource</Link></li>
             <li><Link to="/admin/resources/analytics" style={linkStyle("/admin/resources/analytics")}>📊 Analytics</Link></li>
+
+            {/* Bookings Section */}
+            <li style={{ marginTop: "12px", fontSize: "11px", color: "#93c5fd", textTransform: "uppercase", padding: "0 12px" }}>
+              Bookings
+            </li>
+            <li><Link to="/admin/bookings" style={linkStyle("/admin/bookings")}>📅 Manage Bookings</Link></li>
 
             {/* Tickets Section */}
             <li style={{ marginTop: "12px", fontSize: "11px", color: "#93c5fd", textTransform: "uppercase", padding: "0 12px" }}>

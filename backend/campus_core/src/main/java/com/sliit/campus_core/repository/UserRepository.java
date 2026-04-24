@@ -11,4 +11,5 @@ import com.sliit.campus_core.entity.Role;
 public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByEmail(String email);
     List<User> findByRole(Role role);
+    Optional<User> findByResetToken(String resetToken);
 }

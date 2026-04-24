@@ -5,9 +5,9 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api
 const commentApi = axios.create({ baseURL: API_BASE });
 
 commentApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token") 
-             || localStorage.getItem("jwt") 
-             || localStorage.getItem("accessToken");
+  const token = sessionStorage.getItem("token") 
+             || sessionStorage.getItem("jwt") 
+             || sessionStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

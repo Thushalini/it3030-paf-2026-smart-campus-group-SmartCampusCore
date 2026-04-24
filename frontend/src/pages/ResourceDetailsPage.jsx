@@ -292,6 +292,26 @@ function ResourceDetailsPage() {
 
           {/* ACTIONS */}
           <div className="details-actions">
+            {!isAdminView && (
+              <Link
+                to="/user/bookings/new"
+                state={{ resourceId: resource.id }}
+                className="book-button"
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#2563eb",
+                  color: "white",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  fontWeight: "bold",
+                  display: "inline-block",
+                  textAlign: "center"
+                }}
+              >
+                Book Resource
+              </Link>
+            )}
+
             <button onClick={handleDownloadPdf} className="pdf-button">
               Download PDF
             </button>

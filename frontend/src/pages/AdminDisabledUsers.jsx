@@ -6,7 +6,7 @@ function AdminDisabledUsers() {
 
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const navigate = useNavigate();
 
   const fetchUsers = async () => {

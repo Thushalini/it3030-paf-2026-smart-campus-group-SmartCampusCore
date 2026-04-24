@@ -33,6 +33,9 @@ public class User {
 
     private String provider;
 
+    private String resetToken;
+    private LocalDateTime resetTokenExpiry;
+
     // 🔹 Notification preferences (already good 👍)
     private boolean bookingNotifications = true;
     private boolean ticketNotifications = true;
@@ -79,6 +82,12 @@ public class User {
 
     public String getProvider() { return provider; }
     public void setProvider(String provider) { this.provider = provider; }
+
+    public String getResetToken() { return resetToken; }
+    public void setResetToken(String resetToken) { this.resetToken = resetToken; }
+
+    public LocalDateTime getResetTokenExpiry() { return resetTokenExpiry; }
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) { this.resetTokenExpiry = resetTokenExpiry; }
 
     public boolean isBookingNotifications() { return bookingNotifications; }
     public void setBookingNotifications(boolean bookingNotifications) { this.bookingNotifications = bookingNotifications; }

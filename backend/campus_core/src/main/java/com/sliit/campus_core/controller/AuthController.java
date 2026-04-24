@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sliit.campus_core.dto.LoginRequest;
 import com.sliit.campus_core.dto.SignupRequest;
+import com.sliit.campus_core.dto.ForgotPasswordRequest;
+import com.sliit.campus_core.dto.ResetPasswordRequest;
 import com.sliit.campus_core.entity.User;
 import com.sliit.campus_core.service.AuthService;
 
@@ -61,5 +63,15 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Missing token");
         }
         return ResponseEntity.ok(authService.googleLogin(googleToken));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        return ResponseEntity.ok(authService.forgotPassword(request.getEmail()));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(authService.resetPassword(request.getToken(), request.getNewPassword()));
     }
 }

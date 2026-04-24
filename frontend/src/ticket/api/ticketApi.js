@@ -4,11 +4,11 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api
 
 const ticketApi = axios.create({ baseURL: API_BASE });
 
-// Auto-attach JWT token from localStorage (set by Member 4's OAuth login)
+// Auto-attach JWT token from sessionStorage (set by Member 4's OAuth login)
 ticketApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token") 
-             || localStorage.getItem("jwt") 
-             || localStorage.getItem("accessToken");
+  const token = sessionStorage.getItem("token") 
+             || sessionStorage.getItem("jwt") 
+             || sessionStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
