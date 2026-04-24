@@ -1,15 +1,11 @@
 package com.sliit.campus_core.dto;
 
-import com.sliit.campus_core.entity.ResourceStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+import com.sliit.campus_core.entity.ResourceStatus;
+
 public class ResourceResponse {
+
     private String id;
     private String name;
     private String description;
@@ -19,24 +15,70 @@ public class ResourceResponse {
     private LocalTime endTime;
     private ResourceStatus status;
 
-    public void setStartTime(LocalTime startTime) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ResourceResponse() {
     }
 
-    public void setEndTime(LocalTime endTime) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }   
-
-    public void setStatus(ResourceStatus status) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }       
+    public String getId() {
+        return id;
+    }
 
     public void setId(String id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.description = description;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public ResourceStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ResourceStatus status) {
+        this.status = status;
+    }
 }

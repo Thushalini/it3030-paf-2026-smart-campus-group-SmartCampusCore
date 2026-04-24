@@ -28,9 +28,15 @@ const Sidebar = () => {
     }}>
       <h2 style={{ marginBottom: "24px" }}>Smart Campus</h2>
 
-      <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "4px" }}>
-
-        {/* 👤 USER */}
+      <ul
+        style={{
+          listStyle: "none",
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: "4px",
+        }}
+      >
         {role === "USER" && (
           <>
             <li><Link to="/user" style={linkStyle("/user")}>👤 My Profile</Link></li>
@@ -41,7 +47,6 @@ const Sidebar = () => {
           </>
         )}
 
-        {/* 🛠 TECHNICIAN */}
         {role === "TECHNICIAN" && (
           <>
             <li><Link to="/technician" style={linkStyle("/technician")}>👤 Profile</Link></li>
@@ -49,21 +54,50 @@ const Sidebar = () => {
           </>
         )}
 
-        {/* 👑 ADMIN */}
         {role === "ADMIN" && (
           <>
-            <li><Link to="/admin" style={linkStyle("/admin")}>👤 Admin Profile</Link></li>
+            <li>
+              <Link to="/admin" style={linkStyle("/admin")}>
+                👤 Admin Profile
+              </Link>
+            </li>
 
-            {/* Users Section */}
-            <li style={{ marginTop: "12px", fontSize: "11px", color: "#93c5fd", textTransform: "uppercase", padding: "0 12px" }}>
+            <li
+              style={{
+                marginTop: "12px",
+                fontSize: "11px",
+                color: "#93c5fd",
+                textTransform: "uppercase",
+                padding: "0 12px",
+              }}
+            >
               Users
             </li>
-            <li><Link to="/admin/manage-users" style={linkStyle("/admin/manage-users")}>👥 Manage Users</Link></li>
-            <li><Link to="/admin/disabled-users" style={linkStyle("/admin/disabled-users")}>🚫 Disabled Users</Link></li>
-            <li><Link to="/admin/notifications" style={linkStyle("/admin/notifications")}>🔔 Notifications</Link></li>
+            <li>
+              <Link to="/admin/manage-users" style={linkStyle("/admin/manage-users")}>
+                👥 Manage Users
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin/disabled-users" style={linkStyle("/admin/disabled-users")}>
+                🚫 Disabled Users
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin/notifications" style={linkStyle("/admin/notifications")}>
+                🔔 Notifications
+              </Link>
+            </li>
 
-            {/* Resources Section */}
-            <li style={{ marginTop: "12px", fontSize: "11px", color: "#93c5fd", textTransform: "uppercase", padding: "0 12px" }}>
+            <li
+              style={{
+                marginTop: "12px",
+                fontSize: "11px",
+                color: "#93c5fd",
+                textTransform: "uppercase",
+                padding: "0 12px",
+              }}
+            >
               Resources
             </li>
             <li><Link to="/admin/resources" style={linkStyle("/admin/resources")}>🗂️ Manage Resources</Link></li>
@@ -83,7 +117,6 @@ const Sidebar = () => {
             <li><Link to="/admin/tickets" style={linkStyle("/admin/tickets")}>🎫 Manage Tickets</Link></li>
           </>
         )}
-
       </ul>
     </div>
   );

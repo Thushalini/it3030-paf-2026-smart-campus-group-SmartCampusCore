@@ -46,24 +46,23 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
+    private final NotificationService notificationService;
 
     public BookingService(
             BookingRepository bookingRepository,
             UserRepository userRepository,
-            ResourceRepository resourceRepository
+            ResourceRepository resourceRepository,
+            NotificationService notificationService
     ) {
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
         this.resourceRepository = resourceRepository;
+        this.notificationService = notificationService;
     }
 
     public BookingResponse createBooking(BookingRequest request, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userEmail));
-
-        System.out.println("=== Creating booking for email: " + userEmail 
-        + " | userId: " + user.getId() 
-        + " | userName: " + user.getName());
 
         Resource resource = resourceRepository.findById(request.getResourceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found: " + request.getResourceId()));
@@ -84,44 +83,33 @@ public class BookingService {
         );
 
         booking = bookingRepository.save(booking);
-        
-        // Fetch back to ensure all DBRefs are loaded
-        Booking savedBooking = bookingRepository.findById(booking.getId()).orElse(booking);
-        
-        return convertToBookingResponse(savedBooking);
+        return convertToBookingResponse(booking);
     }
 
     public List<BookingResponse> getMyBookings(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userEmail));
 
-        String userId = user.getId();
+        List<Booking> bookings = bookingRepository.findByUser_IdOrderByCreatedAtDesc(user.getId());
 
-        // Use in-memory filter to reliably match user ID from @DBRef
-        return bookingRepository.findAll().stream()
-                .filter(b -> b.getUser() != null && userId.equals(b.getUser().getId()))
-                .sorted(Comparator.comparing(
-                        Booking::getCreatedAt,
-                        Comparator.nullsLast(Comparator.reverseOrder())
-                ))
+        return bookings.stream()
                 .map(this::convertToBookingResponse)
                 .collect(Collectors.toList());
     }
 
     public List<BookingResponse> getAllBookings(BookingStatus status, LocalDate date, String resourceId) {
-        // Use stream for filtering but with better null safety and efficiency
-        return bookingRepository.findAll().stream()
+        List<Booking> bookings = bookingRepository.findAll().stream()
                 .filter(booking -> status == null || booking.getStatus() == status)
                 .filter(booking -> date == null || date.equals(booking.getDate()))
-                .filter(booking -> {
-                    if (resourceId == null || resourceId.isBlank()) return true;
-                    Resource resource = booking.getResource();
-                    return resource != null && resourceId.equals(resource.getId());
-                })
+                .filter(booking -> resourceId == null || resourceId.isBlank()
+                        || (booking.getResource() != null && resourceId.equals(booking.getResource().getId())))
                 .sorted(Comparator.comparing(
                         Booking::getCreatedAt,
                         Comparator.nullsLast(Comparator.reverseOrder())
                 ))
+                .collect(Collectors.toList());
+
+        return bookings.stream()
                 .map(this::convertToBookingResponse)
                 .collect(Collectors.toList());
     }
@@ -138,6 +126,13 @@ public class BookingService {
         booking.setQrCode(generateQRCode(booking));
 
         booking = bookingRepository.save(booking);
+
+        notificationService.sendNotification(
+            booking.getUser(),
+            "Your booking for " + booking.getResource().getName() + " has been approved.",
+            "BOOKING"
+        );
+
         return convertToBookingResponse(booking);
     }
 
@@ -153,6 +148,13 @@ public class BookingService {
         booking.setRejectionReason(request.getReason());
 
         booking = bookingRepository.save(booking);
+
+        notificationService.sendNotification(
+            booking.getUser(),
+            "Your booking for " + booking.getResource().getName() + " was rejected. Reason: " + request.getReason(),
+            "BOOKING"
+        );
+
         return convertToBookingResponse(booking);
     }
 
@@ -174,6 +176,13 @@ public class BookingService {
         booking.setStatus(BookingStatus.CANCELLED);
 
         booking = bookingRepository.save(booking);
+
+        notificationService.sendNotification(
+            booking.getUser(),
+            "Your booking for " + booking.getResource().getName() + " has been cancelled.",
+            "BOOKING"
+        );
+
         return convertToBookingResponse(booking);
     }
 
@@ -221,18 +230,14 @@ public class BookingService {
     }
 
     private byte[] generateQRCode(Booking booking) {
-        if (booking == null || booking.getResource() == null) {
-            throw new QRCodeGenerationException("Cannot generate QR code: Booking or Resource is null");
-        }
-
         try {
             String qrContent = String.format(
                     "Booking ID: %s, Resource: %s, Date: %s, Time: %s - %s",
                     booking.getId(),
-                    booking.getResource().getName() != null ? booking.getResource().getName() : "Unknown",
-                    booking.getDate() != null ? booking.getDate() : "N/A",
-                    booking.getStartTime() != null ? booking.getStartTime() : "N/A",
-                    booking.getEndTime() != null ? booking.getEndTime() : "N/A"
+                    booking.getResource().getName(),
+                    booking.getDate(),
+                    booking.getStartTime(),
+                    booking.getEndTime()
             );
 
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -279,8 +284,6 @@ public class BookingService {
     }
 
     private ResourceResponse convertToResourceResponse(Resource resource) {
-        if (resource == null) return null;
-        
         ResourceResponse response = new ResourceResponse();
         response.setId(resource.getId());
         response.setName(resource.getName());

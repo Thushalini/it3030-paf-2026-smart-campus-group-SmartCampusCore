@@ -22,7 +22,6 @@ public class Booking {
     @DBRef(lazy = false)
     @Field("user")
     private User user;
-    
     private LocalDate date;
     
     @Field("start_time")

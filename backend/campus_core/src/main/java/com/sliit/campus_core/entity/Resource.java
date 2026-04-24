@@ -25,6 +25,10 @@ public class Resource {
     private String floor;
     private String roomNumber;
     private String availabilityWindow;
+
+    private LocalTime startTime;
+    private LocalTime endTime;
+
     private ResourceStatus status;
     private List<String> features;
     private List<String> imageUrls;
@@ -218,6 +222,4 @@ public class Resource {
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
- 
 }
-
