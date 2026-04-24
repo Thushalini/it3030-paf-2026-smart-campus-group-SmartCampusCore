@@ -1,0 +1,166 @@
+package com.sliit.campus_core.dto;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import com.sliit.campus_core.entity.BookingStatus;
+
+public class BookingResponse {
+    
+    private String id;
+    private String resourceId;
+    private String resourceName;
+    private String resourceLocation;
+    private String userId;
+    private String userName;
+    private String userEmail;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private String purpose;
+    private Integer attendeesCount;
+    private BookingStatus status;
+    private String rejectionReason;
+    private String qrCodeBase64;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    
+    public BookingResponse() {}
+    
+    public String getId() {
+        return id;
+    }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public String getResourceId() {
+        return resourceId;
+    }
+    
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
+    
+    public String getResourceName() {
+        return resourceName;
+    }
+    
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+    }
+    
+    public String getResourceLocation() {
+        return resourceLocation;
+    }
+    
+    public void setResourceLocation(String resourceLocation) {
+        this.resourceLocation = resourceLocation;
+    }
+    
+    public String getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+    
+    public String getUserName() {
+        return userName;
+    }
+    
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+    
+    public String getUserEmail() {
+        return userEmail;
+    }
+    
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+    
+    public LocalDate getDate() {
+        return date;
+    }
+    
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+    
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+    
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+    
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+    
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+    
+    public String getPurpose() {
+        return purpose;
+    }
+    
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+    
+    public Integer getAttendeesCount() {
+        return attendeesCount;
+    }
+    
+    public void setAttendeesCount(Integer attendeesCount) {
+        this.attendeesCount = attendeesCount;
+    }
+    
+    public BookingStatus getStatus() {
+        return status;
+    }
+    
+    public void setStatus(BookingStatus status) {
+        this.status = status;
+    }
+    
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+    
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
+    
+    public String getQrCodeBase64() {
+        return qrCodeBase64;
+    }
+    
+    public void setQrCodeBase64(String qrCodeBase64) {
+        this.qrCodeBase64 = qrCodeBase64;
+    }
+    
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+}
