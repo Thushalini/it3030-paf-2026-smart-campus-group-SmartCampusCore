@@ -12,7 +12,6 @@ export default function MyTicketsPage() {
   const isFirstRender = useRef(true);
 
   // Refetch when navigating back to this page, but NOT on initial mount
-  // (useTickets already fetches on mount)
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -25,9 +24,23 @@ export default function MyTicketsPage() {
     navigate(`/tickets/${ticket.id}`);
   };
 
+  // Check if any filter is active (status, priority, category, or search)
+  const hasActiveFilters = filters.status || filters.priority || filters.category || filters.search;
+
+  const handleClearFilters = () => {
+    setFilters({});  // Resets all filters to empty/undefined
+  };
+
   return (
     <div className="my-tickets-page">
-      <h2>My Tickets</h2>
+      <div className="page-header-row">
+        <h2>My Tickets</h2>
+        {hasActiveFilters && (
+          <button className="btn-clear-filters" onClick={handleClearFilters}>
+            ✕ Clear all filters
+          </button>
+        )}
+      </div>
 
       <TicketFilterBar
         filters={filters}

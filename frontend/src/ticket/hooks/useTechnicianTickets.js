@@ -22,7 +22,6 @@ export default function useTechnicianTickets(initialFilters = {}) {
       // Backend already filters by assigned technician when role = TECHNICIAN
       let list = response.data?.data?.content || [];
 
-      // Only apply optional client-side filters
       if (filters.status) list = list.filter((t) => t.status === filters.status);
       if (filters.search) {
         const s = filters.search.toLowerCase();

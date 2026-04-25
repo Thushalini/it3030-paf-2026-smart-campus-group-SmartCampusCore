@@ -39,6 +39,10 @@ public class TicketResponseDTO {
     private String slaResolutionDisplay;
     private Boolean slaBreached;
 
+    // Separate breach flags for first response and resolution
+    private Boolean firstResponseSlaBreached;
+    private Boolean resolutionSlaBreached;
+
     @JsonProperty("firstResponseAt")
     private LocalDateTime firstResponseAt;
     

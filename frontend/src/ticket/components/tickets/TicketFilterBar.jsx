@@ -2,8 +2,23 @@ import "./TicketFilterBar.css";
 
 export default function TicketFilterBar({ filters, onFilterChange, showAssigneeFilter = false }) {
   const handleChange = (e) => {
-    onFilterChange({ ...filters, [e.target.name]: e.target.value });
+    // Convert empty string to null for cleaner state
+    const value = e.target.value === "" ? null : e.target.value;
+    onFilterChange({ ...filters, [e.target.name]: value });
   };
+
+  const handleClearAll = () => {
+    onFilterChange({
+      status: null,
+      priority: null,
+      category: null,
+      search: null,
+      assignedToId: null,
+    });
+  };
+
+  // Check if any filter (except assignedToId) is active
+  const hasActiveFilters = !!(filters.status || filters.priority || filters.category || filters.search);
 
   return (
     <div className="filter-bar">
@@ -38,7 +53,7 @@ export default function TicketFilterBar({ filters, onFilterChange, showAssigneeF
       {showAssigneeFilter && (
         <select name="assignedToId" value={filters.assignedToId || ""} onChange={handleChange}>
           <option value="">All Technicians</option>
-          {/* TODO: populate technician list from backend once Member 2 API is ready */}
+          {/* TODO: populate technician list from backend */}
         </select>
       )}
 
@@ -49,6 +64,12 @@ export default function TicketFilterBar({ filters, onFilterChange, showAssigneeF
         value={filters.search || ""}
         onChange={handleChange}
       />
+
+      {hasActiveFilters && (
+        <button type="button" className="btn-clear-filters" onClick={handleClearAll}>
+          ✕ Clear all
+        </button>
+      )}
     </div>
   );
 }

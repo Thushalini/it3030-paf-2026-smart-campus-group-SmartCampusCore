@@ -161,7 +161,8 @@ export default function AdminTicketManagementPage() {
                 <th>Category</th>
                 <th>Priority</th>
                 <th>Status</th>
-                <th>SLA</th>
+                <th>SLA (First)</th>
+                <th>SLA (Resolution)</th>
                 <th>Reported By</th>
                 <th>Assigned To</th>
                 <th>Created</th>
@@ -192,9 +193,18 @@ export default function AdminTicketManagementPage() {
                       </span>
                     </td>
                     <td>
-                      {t.slaBreached === true ? (
+                      {t.firstResponseSlaBreached === true ? (
                         <span className="badge sla-breached">Breached</span>
-                      ) : t.slaBreached === false ? (
+                      ) : t.firstResponseSlaBreached === false ? (
+                        <span className="badge sla-ok">Met</span>
+                      ) : (
+                        <span className="badge sla-pending">Pending</span>
+                      )}
+                    </td>
+                    <td>
+                      {t.resolutionSlaBreached === true ? (
+                        <span className="badge sla-breached">Breached</span>
+                      ) : t.resolutionSlaBreached === false ? (
                         <span className="badge sla-ok">Met</span>
                       ) : (
                         <span className="badge sla-pending">Pending</span>

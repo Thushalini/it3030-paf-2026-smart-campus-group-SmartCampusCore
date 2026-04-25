@@ -26,17 +26,44 @@ public class SLAService {
         }
     }
 
-    public boolean isSLABreached(Ticket ticket) {
+    public Boolean isSLABreached(Ticket ticket) {  
+        // No SLA data recorded yet – status is "Pending"
+        if (ticket.getFirstResponseTimeMinutes() == null && 
+            ticket.getResolutionTimeMinutes() == null) {
+            return null;
+        }
+        
         SLATargetDTO target = computeSLATarget(ticket.getPriority());
+        
         if (ticket.getFirstResponseTimeMinutes() != null &&
             ticket.getFirstResponseTimeMinutes() > target.getFirstResponseTargetMinutes()) {
             return true;
         }
+        
         if (ticket.getResolutionTimeMinutes() != null &&
             ticket.getResolutionTimeMinutes() > target.getResolutionTargetMinutes()) {
             return true;
         }
-        return false;
+        
+        return false;  
+    }
+
+    // Check first response breach only
+    public Boolean isFirstResponseBreached(Ticket ticket) {
+        if (ticket.getFirstResponseTimeMinutes() == null) {
+            return null;   // pending
+        }
+        SLATargetDTO target = computeSLATarget(ticket.getPriority());
+        return ticket.getFirstResponseTimeMinutes() > target.getFirstResponseTargetMinutes();
+    }
+
+    // Check resolution breach only
+    public Boolean isResolutionBreached(Ticket ticket) {
+        if (ticket.getResolutionTimeMinutes() == null) {
+            return null;   // pending
+        }
+        SLATargetDTO target = computeSLATarget(ticket.getPriority());
+        return ticket.getResolutionTimeMinutes() > target.getResolutionTargetMinutes();
     }
 
     public String formatDuration(Long minutes) {

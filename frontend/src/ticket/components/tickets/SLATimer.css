@@ -127,6 +127,52 @@
   border: 1px solid #fecaca;
 }
 
+/* Metric-specific status colors */
+.sla-metric.metric-breached {
+  background: #fee2e2;
+  border-left: 4px solid #ef4444;
+}
+
+.sla-metric.metric-met {
+  background: #f0fdf4;
+  border-left: 4px solid #22c55e;
+}
+
+.sla-metric.metric-pending {
+  background: #fefce8;
+  border-left: 4px solid #eab308;
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.metric-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.metric-breached .metric-badge {
+  background: #ef4444;
+  color: white;
+}
+
+.metric-met .metric-badge {
+  background: #22c55e;
+  color: white;
+}
+
+.metric-pending .metric-badge {
+  background: #eab308;
+  color: white;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .sla-metrics {

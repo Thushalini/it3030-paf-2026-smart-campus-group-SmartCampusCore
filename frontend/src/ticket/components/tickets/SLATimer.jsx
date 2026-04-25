@@ -18,7 +18,7 @@ export default function SLATimer({ ticket }) {
     };
 
     updateElapsed();
-    const interval = setInterval(updateElapsed, 60000); // update every minute
+    const interval = setInterval(updateElapsed, 60000);
 
     return () => clearInterval(interval);
   }, [ticket]);
@@ -40,20 +40,40 @@ export default function SLATimer({ ticket }) {
 
   if (!ticket) return null;
 
-  const isBreached = ticket.slaBreached;
   const hasFirstResponse = !!ticket.firstResponseAt;
   const hasResolution = !!ticket.resolvedAt;
 
+  // Get breach status for each metric (true = breached, false = met, null = pending)
+  const firstResponseBreached = ticket.firstResponseSlaBreached;
+  const resolutionBreached = ticket.resolutionSlaBreached;
+
+  // Helper to get CSS class for each metric
+  const getMetricClass = (breached) => {
+    if (breached === true) return "metric-breached";
+    if (breached === false) return "metric-met";
+    return "metric-pending";
+  };
+
+  // Helper to get label text
+  const getMetricLabel = (breached) => {
+    if (breached === true) return "Breached";
+    if (breached === false) return "Met";
+    return "Pending";
+  };
+
   return (
-    <div className={`sla-timer ${isBreached ? "sla-breached" : "sla-ok"}`}>
+    <div className="sla-timer">
       <div className="sla-header">
         <span className="sla-title">⏱ SLA Status</span>
-        {isBreached && <span className="breached-badge">BREACHED</span>}
       </div>
 
       <div className="sla-metrics">
-        <div className="sla-metric">
-          <span className="metric-label">First Response</span>
+        {/* First Response Metric */}
+        <div className={`sla-metric ${getMetricClass(firstResponseBreached)}`}>
+          <div className="metric-header">
+            <span className="metric-label">First Response</span>
+            <span className="metric-badge">{getMetricLabel(firstResponseBreached)}</span>
+          </div>
           <span className="metric-value">
             {hasFirstResponse
               ? ticket.slaFirstResponseDisplay || formatDuration(ticket.firstResponseTimeMinutes)
@@ -66,8 +86,12 @@ export default function SLATimer({ ticket }) {
           )}
         </div>
 
-        <div className="sla-metric">
-          <span className="metric-label">Resolution</span>
+        {/* Resolution Metric */}
+        <div className={`sla-metric ${getMetricClass(resolutionBreached)}`}>
+          <div className="metric-header">
+            <span className="metric-label">Resolution</span>
+            <span className="metric-badge">{getMetricLabel(resolutionBreached)}</span>
+          </div>
           <span className="metric-value">
             {hasResolution
               ? ticket.slaResolutionDisplay || formatDuration(ticket.resolutionTimeMinutes)
@@ -76,7 +100,8 @@ export default function SLATimer({ ticket }) {
         </div>
       </div>
 
-      {isBreached && (
+      {/* Global warning if either is breached */}
+      {(firstResponseBreached === true || resolutionBreached === true) && (
         <div className="sla-warning">
           ⚠️ SLA target exceeded — escalate to supervisor
         </div>

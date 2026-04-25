@@ -24,7 +24,6 @@ export default function useAdminTickets(initialFilters = {}) {
       const pageData = response.data?.data;
       let list = pageData?.content || [];
 
-      // Client-side filtering only
       if (filters.status) list = list.filter((t) => t.status === filters.status);
       if (filters.priority) list = list.filter((t) => t.priority === filters.priority);
       if (filters.category) list = list.filter((t) => t.category === filters.category);

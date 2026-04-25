@@ -48,8 +48,12 @@ public class TicketMapper {
         dto.setSlaFirstResponseDisplay(formatDuration(ticket.getFirstResponseTimeMinutes()));
         dto.setSlaResolutionDisplay(formatDuration(ticket.getResolutionTimeMinutes()));
 
-        // Use SLAService to determine if SLA is breached (per‑priority)
+        // Use SLAService to determine if SLA is breached (per‑priority) – overall flag
         dto.setSlaBreached(slaService.isSLABreached(ticket));
+
+        // Separate breach flags for first response and resolution
+        dto.setFirstResponseSlaBreached(slaService.isFirstResponseBreached(ticket));
+        dto.setResolutionSlaBreached(slaService.isResolutionBreached(ticket));
 
         dto.setCommentsCount(0);
         return dto;

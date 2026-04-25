@@ -67,7 +67,7 @@ export default function TechnicianTicketPage() {
                 <th>Category</th>
                 <th>Priority</th>
                 <th>Status</th>
-                <th>SLA</th>
+                <th>SLA (Res)</th>
                 <th>Location</th>
                 <th>Created</th>
                 <th>Actions</th>
@@ -97,12 +97,12 @@ export default function TechnicianTicketPage() {
                       </span>
                     </td>
                     <td>
-                      {t.slaBreached === true ? (
-                        <span className="badge sla-breached">Breached</span>
-                      ) : t.slaBreached === false ? (
-                        <span className="badge sla-ok">Met</span>
+                      {t.resolutionSlaBreached === true ? (
+                        <span className="badge sla-breached">Resolution Breached</span>
+                      ) : t.resolutionSlaBreached === false ? (
+                        <span className="badge sla-ok">Resolution Met</span>
                       ) : (
-                        <span className="badge sla-pending">Pending</span>
+                        <span className="badge sla-pending">Resolution Pending</span>
                       )}
                     </td>
                     <td>{t.location}</td>

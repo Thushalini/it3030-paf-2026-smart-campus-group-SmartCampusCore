@@ -160,16 +160,23 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Page<TicketResponseDTO> getMyTickets(TicketFilterRequestDTO filter, Pageable pageable) {
-        Page<Ticket> page = ticketRepository.findByReportedByIdOrderByCreatedAtDesc(filter.getReportedById(), pageable);
+        // cast reportedById from Object to String
+        String reportedById = (String) filter.getReportedById();
+        Page<Ticket> page = ticketRepository.findByReportedByIdOrderByCreatedAtDesc(reportedById, pageable);
 
         List<TicketResponseDTO> filtered = page.stream()
             .filter(t -> filter.getStatus() == null || t.getStatus() == filter.getStatus())
             .filter(t -> filter.getPriority() == null || t.getPriority() == filter.getPriority())
             .filter(t -> filter.getCategory() == null || t.getCategory() == filter.getCategory())
             .filter(t -> filter.getResourceId() == null || t.getResourceId().equals(filter.getResourceId()))
-            .filter(t -> filter.getSearch() == null 
-                || t.getTitle().toLowerCase().contains(filter.getSearch().toLowerCase()) 
-                || t.getDescription().toLowerCase().contains(filter.getSearch().toLowerCase()))
+            // handle search as Object and cast to String
+            .filter(t -> {
+                Object searchObj = filter.getSearch();
+                if (searchObj == null) return true;
+                String searchLower = searchObj.toString().toLowerCase();
+                return t.getTitle().toLowerCase().contains(searchLower) 
+                    || t.getDescription().toLowerCase().contains(searchLower);
+            })
             .map(ticketMapper::toResponseDTO)
             .toList();
 
@@ -186,7 +193,7 @@ public class TicketServiceImpl implements TicketService {
             throw new InvalidStatusTransitionException("Cannot transition from " + ticket.getStatus() + " to " + dto.getNewStatus());
         }
 
-        // FIX: Capture fromStatus BEFORE mutating the ticket
+        // Capture fromStatus BEFORE mutating the ticket
         TicketStatus fromStatus = ticket.getStatus();
 
         ticket.setStatus(dto.getNewStatus());
@@ -219,7 +226,7 @@ public class TicketServiceImpl implements TicketService {
 
         TicketStatusHistory history = TicketStatusHistory.builder()
                 .ticketId(ticketId)
-                .fromStatus(fromStatus.name())          // FIX: was ticket.getStatus().name() (already mutated)
+                .fromStatus(fromStatus.name())          
                 .toStatus(dto.getNewStatus().name())
                 .changedById(changedById)
                 .changedByName(changedByName)
@@ -244,7 +251,12 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketResponseDTO assignTechnician(String ticketId, TicketAssignRequestDTO dto,
-                                              String adminId, String adminName, String adminRole) {
+                                            String adminId, String adminName, String adminRole) {
+        // Only ADMIN can assign a technician
+        if (!"ADMIN".equalsIgnoreCase(adminRole)) {
+            throw new RuntimeException("Only administrators can assign technicians to tickets");
+        }
+
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
@@ -255,18 +267,18 @@ public class TicketServiceImpl implements TicketService {
         ticket.setAssignedToId(dto.getTechnicianId());
         ticket.setAssignedToName(dto.getTechnicianName());
 
-        // NEW: Auto-transition OPEN → IN_PROGRESS when a technician is assigned
         TicketStatus previousStatus = ticket.getStatus();
         if (ticket.getStatus() == TicketStatus.OPEN) {
-            // --- SLA RECORDING first response at ---
-            LocalDateTime now = LocalDateTime.now();
+            // === SLA RECORDING (same as updateTicketStatus) ===
             if (ticket.getFirstResponseAt() == null) {
+                LocalDateTime now = LocalDateTime.now();
                 ticket.setFirstResponseAt(now);
                 long minutes = Duration.between(ticket.getCreatedAt(), 
                         now.atZone(ZoneId.systemDefault()).toInstant()).toMinutes();
                 ticket.setFirstResponseTimeMinutes(minutes);
             }
-            // ------------------------------
+            // =================================================
+
             ticket.setStatus(TicketStatus.IN_PROGRESS);
             ticket.setUpdatedAt(Instant.now());
 
@@ -372,5 +384,4 @@ public class TicketServiceImpl implements TicketService {
         return ticketRepository.findByResourceId(resourceId, pageable)
                 .map(ticketMapper::toResponseDTO);
     }
-
 }
