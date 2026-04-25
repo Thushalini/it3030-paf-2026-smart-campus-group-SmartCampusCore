@@ -258,6 +258,15 @@ public class TicketServiceImpl implements TicketService {
         // NEW: Auto-transition OPEN → IN_PROGRESS when a technician is assigned
         TicketStatus previousStatus = ticket.getStatus();
         if (ticket.getStatus() == TicketStatus.OPEN) {
+            // --- SLA RECORDING first response at ---
+            LocalDateTime now = LocalDateTime.now();
+            if (ticket.getFirstResponseAt() == null) {
+                ticket.setFirstResponseAt(now);
+                long minutes = Duration.between(ticket.getCreatedAt(), 
+                        now.atZone(ZoneId.systemDefault()).toInstant()).toMinutes();
+                ticket.setFirstResponseTimeMinutes(minutes);
+            }
+            // ------------------------------
             ticket.setStatus(TicketStatus.IN_PROGRESS);
             ticket.setUpdatedAt(Instant.now());
 

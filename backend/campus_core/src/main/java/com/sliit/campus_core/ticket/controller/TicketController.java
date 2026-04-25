@@ -16,7 +16,7 @@ import com.sliit.campus_core.ticket.service.TicketService;
 import com.sliit.campus_core.entity.User;
 import com.sliit.campus_core.repository.UserRepository;
 import jakarta.validation.Valid;
-import com.sliit.campus_core.entity.Role;  // adjust package if different
+import com.sliit.campus_core.entity.Role; 
 import java.util.stream.Collectors;
 
 import java.io.IOException;
