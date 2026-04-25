@@ -3,15 +3,19 @@ package com.sliit.campus_core.ticket.mapper;
 import com.sliit.campus_core.dto.ticket.ContactDetailsDTO;
 import com.sliit.campus_core.dto.ticket.TicketResponseDTO;
 import com.sliit.campus_core.ticket.model.Ticket;
-import com.sliit.campus_core.ticket.model.enums.TicketStatus;
+import com.sliit.campus_core.ticket.service.SLAService;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TicketMapper {
-    
-    private static final long FIRST_RESPONSE_SLA_MINUTES = 15;
-    private static final long RESOLUTION_SLA_MINUTES = 120; // 2 hours
-    
+
+    private final SLAService slaService;
+
+    // Constructor injection – Spring will provide the SLAService bean
+    public TicketMapper(SLAService slaService) {
+        this.slaService = slaService;
+    }
+
     public TicketResponseDTO toResponseDTO(Ticket ticket) {
         TicketResponseDTO dto = new TicketResponseDTO();
         dto.setId(ticket.getId());
@@ -39,16 +43,18 @@ public class TicketMapper {
         dto.setResolutionTimeMinutes(ticket.getResolutionTimeMinutes());
         dto.setResolutionNote(ticket.getResolutionNote());
         dto.setRejectionReason(ticket.getRejectionReason());
-        
-        // Calculate SLA fields
+
+        // Calculate SLA display strings (formatting only)
         dto.setSlaFirstResponseDisplay(formatDuration(ticket.getFirstResponseTimeMinutes()));
         dto.setSlaResolutionDisplay(formatDuration(ticket.getResolutionTimeMinutes()));
-        dto.setSlaBreached(isSlaBreached(ticket));
-        
+
+        // Use SLAService to determine if SLA is breached (per‑priority)
+        dto.setSlaBreached(slaService.isSLABreached(ticket));
+
         dto.setCommentsCount(0);
         return dto;
     }
-    
+
     private String formatDuration(Long minutes) {
         if (minutes == null) return null;
         long hours = minutes / 60;
@@ -59,19 +65,4 @@ public class TicketMapper {
             return mins + "m";
         }
     }
-    
-    private Boolean isSlaBreached(Ticket ticket) {
-        // Check resolution SLA if ticket is resolved
-        if (ticket.getStatus() == TicketStatus.RESOLVED || ticket.getStatus() == TicketStatus.CLOSED) {
-            if (ticket.getResolutionTimeMinutes() != null) {
-                return ticket.getResolutionTimeMinutes() > RESOLUTION_SLA_MINUTES;
-            }
-        }
-        // Check first response SLA if ticket has been responded to
-        if (ticket.getFirstResponseTimeMinutes() != null) {
-            return ticket.getFirstResponseTimeMinutes() > FIRST_RESPONSE_SLA_MINUTES;
-        }
-        // No SLA breach yet
-        return null;
-    }    
 }
