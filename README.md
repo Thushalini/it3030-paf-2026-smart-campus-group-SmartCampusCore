@@ -19,6 +19,8 @@ It helps manage university operations like resources, bookings, users, and admin
 - 🔔 Real-time notifications
 - 📱 Fully responsive UI design
 - ⚡ Fast React-based architecture
+- 🎫 Full ticket lifecycle management – Users can create tickets with up to 3 image attachments, assign technicians, track status (OPEN → IN_PROGRESS → RESOLVED → CLOSED / REJECTED), and add/edit/delete comments with role‑based ownership rules.
+- ⌛ Priority‑based SLA monitoring – Real‑time tracking of time‑to‑first‑response and time‑to‑resolution with per‑priority targets (CRITICAL: 60min/4h, HIGH: 4h/24h, MEDIUM: 8h/48h, LOW: 24h/5d), live count‑up timer, and visual breach alerts on admin/technician dashboards.
 
 ---
 
@@ -41,8 +43,7 @@ src/
 │── context/ # Authentication & global state
 │── layouts/ # Layout components
 │── pages/ # Application pages (Dashboard, Login, etc.)
-│── routes/ # Private & public routes
-│── styles/ # CSS files
+│── routes/ # Private & public routes 
 │── App.js
 │── main.jsx
 
@@ -64,10 +65,18 @@ npm install
 
 ### Environment Variables
 Create a .env file in the root directory
+
 ```
 REACT_APP_API_BASE_URL=http://localhost:8080/api
 REACT_APP_GOOGLE_CLIENT_ID=your_google_client_id
 ```
+
+Add this in application.properties
+```
+spring.data.mongodb.uri={MONGODB_URI}
+spring.security.oauth2.client.registration.google.client-id = {GOOGLE_CLIENT_ID}
+jwt.secret=myverysecuresecretkey_that_is_at_least_32_bytes!
+spring.data.mongodb.database={DATABASE_NAME}
 
 ### frontend run
 ```
